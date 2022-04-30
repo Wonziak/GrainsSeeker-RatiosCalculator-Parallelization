@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
-from ImageConfig import ImageConfig
+from Config.ImageConfig import ImageConfig
 from numba import njit, cuda, prange
-from timeit import default_timer as timer
 import math
 
 
@@ -19,20 +18,21 @@ def generate_binary_images(method="SEQ"):
 
 
 def __find_layers_sequentially(image, colors):
-    phaselayers = []
-    for color in colors.values():
+    phase_layers = {}
+    for phase in colors.keys():
+        color = colors[phase]
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
         for i in range(ImageConfig.width):
             for j in range(ImageConfig.height):
                 if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
                     layer[j, i, 0] = 255
-        phaselayers.append(layer)
-    return phaselayers
+        phase_layers[phase] = layer
+    return phase_layers
 
 
 def __find_layers_gpu(image, colors):
-    phaselayers = []
-    layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
+    phase_layers = {}
+    empty_array = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
     x_gpu = cuda.to_device(image)
 
     threadsperblock = (16, 16)
@@ -40,13 +40,14 @@ def __find_layers_gpu(image, colors):
     blockspergrid_y = math.ceil(x_gpu.shape[1] / threadsperblock[1])
     blockspergrid = (blockspergrid_x, blockspergrid_y)
 
-    for color in colors.values():
-        out_gpu = cuda.device_array_like(layer)
+    for phase in colors.keys():
+        color = colors[phase]
+        out_gpu = cuda.device_array_like(empty_array)
         __iterate_on_image_compare_color_cuda[blockspergrid, threadsperblock](x_gpu, color, out_gpu)
         cuda.synchronize()
-        array = out_gpu.copy_to_host()
-        phaselayers.append(array)
-    return phaselayers
+        layer = out_gpu.copy_to_host()
+        phase_layers[phase] = layer
+    return phase_layers
 
 
 @cuda.jit
@@ -60,12 +61,13 @@ def __iterate_on_image_compare_color_cuda(image, color, layer):
 
 
 def __find_layers_cpu_parallel(image, colors):
-    phaselayers = []
-    for color in colors.values():
+    phase_layers = {}
+    for phase in colors.keys():
+        color = colors[phase]
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
         __iterate_on_image_compare_color_cpu(image, ImageConfig.width, ImageConfig.height, layer, color)
-        phaselayers.append(layer)
-    return phaselayers
+        phase_layers[phase] = layer
+    return phase_layers
 
 
 @njit(parallel=True)
@@ -76,8 +78,8 @@ def __iterate_on_image_compare_color_cpu(image, width, height, layer, color):
                 layer[j, i, 0] = 255
 
 
-def show_layers(phaselayers):
-    for i in range(ImageConfig.colorsNumber):
-        cv2.imshow('binary', phaselayers[i])
+def show_layers(phase_layers=dict):
+    for layer in phase_layers.values():
+        cv2.imshow('binary', layer)
         cv2.waitKey(0)
         cv2.destroyAllWindows()

@@ -1,12 +1,14 @@
-import cv2
 from binaryImagesGenerator import generate_binary_images, show_layers
-from ImageConfig import ImageConfig
+from Config.ImageConfig import ImageConfig
+from countoursFinder import find_contours
+
 
 if __name__ == '__main__':
     image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     image_config = ImageConfig.generate_image_info(image_path=image_path)
-    layers = generate_binary_images(method="GPU")
-    show_layers(layers)
+    phase_layers = generate_binary_images(method="CPU")
+    find_contours(phase_layers)
+    # show_layers(layers)
     # ratiosToCalculateList = ['Malinowska',
     #                          'Blair Bliss',
     #                          'Danielsson',
