@@ -1,11 +1,11 @@
 from binaryImagesGenerator import generate_binary_images, show_layers
 from Config.ImageConfig import ImageConfig
+from Config.DevicesInfo import devices_info
 from countoursFinder import find_contours, find_contours_threading
-import subprocess
+
 
 if __name__ == '__main__':
-    print("CPU model: ", sep=" ")
-    print(subprocess.check_output("wmic cpu get name, numberofcores, maxclockspeed", shell=True).strip().decode())
+    devices_info()
     image_path = 'RealImages/9600x9600.png'
     # image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     # color_map = ImageConfig.colors_map = {
