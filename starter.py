@@ -1,8 +1,11 @@
 from binaryImagesGenerator import generate_binary_images, show_layers
 from Config.ImageConfig import ImageConfig
 from countoursFinder import find_contours, find_contours_threading
+import subprocess
 
 if __name__ == '__main__':
+    print("CPU model: ", sep=" ")
+    print(subprocess.check_output("wmic cpu get name, numberofcores, maxclockspeed", shell=True).strip().decode())
     image_path = 'RealImages/9600x9600.png'
     # image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     # color_map = ImageConfig.colors_map = {
@@ -12,14 +15,13 @@ if __name__ == '__main__':
     # }
     image_config = ImageConfig.generate_image_info(image_path=image_path)
     phase_layers = generate_binary_images(method="GPU")
-    # phase_layers = generate_binary_images(method="GPU")
-    # phase_layers = generate_binary_images(method="CPU")
-    # phase_layers = generate_binary_images(method="CPU")
-    # phase_layers = generate_binary_images(method="SEQ")
-    # phase_layers = generate_binary_images(method="SEQ")
+    phase_layers = generate_binary_images(method="GPU")
+    phase_layers = generate_binary_images(method="CPU")
+    phase_layers = generate_binary_images(method="CPU")
+    phase_layers = generate_binary_images(method="SEQ")
+    phase_layers = generate_binary_images(method="SEQ")
 
     find_contours(phase_layers)
-    find_contours_threading(phase_layers)
     find_contours_threading(phase_layers)
     # show_layers(phase_layers)
     # ratiosToCalculateList = ['Malinowska',
@@ -41,9 +43,9 @@ if __name__ == '__main__':
     #
     #                               'Linealpath']
     colors = {
-        'ferrite': (0, 255, 0),
-        'bainite': (0, 0, 255),
-        'martensite': (255, 0, 0),
+    'ferrite': (0, 255, 0),
+    'bainite': (0, 0, 255),
+    'martensite': (255, 0, 0),
     }
 
     # x, y = Rc().calculate_ratios(image=image, background='bainite')

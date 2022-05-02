@@ -14,8 +14,8 @@ def find_contours(phase_layers=dict):
         contours, _ = cv2.findContours(layer, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         phase_contours[phase] = contours
     print("findContours sequentially time is: " + str(time.time() - start_time))
-    for phase, contours in phase_contours.items():
-        print("{phase}: {contours_count} contours found".format(phase=phase, contours_count=len(contours)))
+    # for phase, contours in phase_contours.items():
+    #     print("{phase}: {contours_count} contours found".format(phase=phase, contours_count=len(contours)))
 
 
 def find_contours_threading(phase_layers=dict):
@@ -29,8 +29,8 @@ def find_contours_threading(phase_layers=dict):
     with Pool(ImageConfig.colorsNumber) as pool:
         pool.starmap(parallel_find_contours, arguments)
     print("findContours multiprocessing time is: " + str(time.time() - start_time))
-    for phase, contours in phase_contours.items():
-        print("{phase}: {contours_count} contours found".format(phase=phase, contours_count=len(contours)))
+    # for phase, contours in phase_contours.items():
+    #     print("{phase}: {contours_count} contours found".format(phase=phase, contours_count=len(contours)))
 
 
 def parallel_find_contours(phase_contours: dict, phase, layer):
