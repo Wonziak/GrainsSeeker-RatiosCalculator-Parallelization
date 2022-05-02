@@ -1,0 +1,11 @@
+
+GTX 1060 Cuda cores: 1280
+GPU parallel time: 0.3750035762786865
+GPU parallel time: 0.12497282028198242
+
+I7-7700HQ 2,8GHz
+CPU parallel time: 1.9070205688476562
+CPU parallel time: 1.579805850982666
+
+
+Sequentially time: 626.8048257827759

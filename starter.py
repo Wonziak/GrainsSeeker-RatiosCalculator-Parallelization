@@ -4,11 +4,17 @@ from countoursFinder import find_contours
 
 
 if __name__ == '__main__':
-    image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
+    image_path = 'RealImages/9600x9600.png'
     image_config = ImageConfig.generate_image_info(image_path=image_path)
+    phase_layers = generate_binary_images(method="GPU")
+    phase_layers = generate_binary_images(method="GPU")
     phase_layers = generate_binary_images(method="CPU")
-    find_contours(phase_layers)
-    # show_layers(layers)
+    phase_layers = generate_binary_images(method="CPU")
+    phase_layers = generate_binary_images(method="SEQ")
+    phase_layers = generate_binary_images(method="SEQ")
+
+    # find_contours(phase_layers)
+    # show_layers(phase_layers)
     # ratiosToCalculateList = ['Malinowska',
     #                          'Blair Bliss',
     #                          'Danielsson',

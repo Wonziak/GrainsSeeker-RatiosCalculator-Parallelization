@@ -3,6 +3,7 @@ import numpy as np
 from Config.ImageConfig import ImageConfig
 from numba import njit, cuda, prange
 import math
+import time
 
 
 def generate_binary_images(method="SEQ"):
@@ -19,6 +20,7 @@ def generate_binary_images(method="SEQ"):
 
 def __find_layers_sequentially(image, colors):
     phase_layers = {}
+    start_time = time.time()
     for phase in colors.keys():
         color = colors[phase]
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
@@ -27,6 +29,7 @@ def __find_layers_sequentially(image, colors):
                 if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
                     layer[j, i, 0] = 255
         phase_layers[phase] = layer
+    print("Sequentially time: " + str(time.time() - start_time))
     return phase_layers
 
 
@@ -39,7 +42,7 @@ def __find_layers_gpu(image, colors):
     blockspergrid_x = math.ceil(x_gpu.shape[0] / threadsperblock[0])
     blockspergrid_y = math.ceil(x_gpu.shape[1] / threadsperblock[1])
     blockspergrid = (blockspergrid_x, blockspergrid_y)
-
+    start_time = time.time()
     for phase in colors.keys():
         color = colors[phase]
         out_gpu = cuda.device_array_like(empty_array)
@@ -47,6 +50,7 @@ def __find_layers_gpu(image, colors):
         cuda.synchronize()
         layer = out_gpu.copy_to_host()
         phase_layers[phase] = layer
+    print("GPU parallel time: " + str(time.time()-start_time))
     return phase_layers
 
 
@@ -62,11 +66,13 @@ def __iterate_on_image_compare_color_cuda(image, color, layer):
 
 def __find_layers_cpu_parallel(image, colors):
     phase_layers = {}
+    start_time = time.time()
     for phase in colors.keys():
         color = colors[phase]
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
         __iterate_on_image_compare_color_cpu(image, ImageConfig.width, ImageConfig.height, layer, color)
         phase_layers[phase] = layer
+    print("CPU parallel time: " + str(time.time() - start_time))
     return phase_layers
 
 
