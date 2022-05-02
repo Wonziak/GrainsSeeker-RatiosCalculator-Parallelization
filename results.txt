@@ -4,17 +4,30 @@ picture 9600x9600 {
     GPU parallel time: 0.375
     GPU parallel time: 0.1249
 
-    i7-7700HQ 2.8GHz -3.4GHz
+    i7-7700HQ 2.8GHz - 3.4GHz
     CPU parallel time: 1.907
     CPU parallel time: 1.5798
     Sequentially time: 626.8048
-    opencv.findContours time for sequential algorithm 1.5521
-    opencv.findContours time for multiprocessing algorithm 2.5162
+    opencv.findContours time for sequential algorithm: 1.5521
+    opencv.findContours time for multiprocessing algorithm: 2.5162
 
     i5-10210U 1.6GHz - 4GHz
     CPU parallel time: 2.4525
     CPU parallel time: 1.9995
     Sequentially time: 641.2855
-    opencv.findContours time for sequential algorithm 1.2028
-    opencv.findContours time for multiprocessing algorithm 2.2026
+    opencv.findContours time for sequential algorithm: 1.2028
+    opencv.findContours time for multiprocessing algorithm: 2.2026
+
+
+    NVIDIA GeForce GTX 950M
+    GPU total CUDA cores:  640
+    GPU parallel time: 1.0734
+    GPU parallel time: 0.3468
+
+    i5-6300HQ 2.30GHz - 2.8GHz
+    CPU parallel time: 3.446918487548828
+    CPU parallel time: 2.584380626678467
+    Sequentially time: 1113.3054127693176
+    opencv.findContours time for sequential algorithm: 2.6448
+    opencv.findContours time for multiprocessing algorithm: 4.45837
  }
