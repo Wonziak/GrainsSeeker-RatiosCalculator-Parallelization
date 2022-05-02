@@ -1,11 +1,19 @@
 
-GTX 1060 Cuda cores: 1280
-GPU parallel time: 0.3750035762786865
-GPU parallel time: 0.12497282028198242
+picture 9600x9600 {
+    GTX 1060 Cuda cores: 1280
+    GPU parallel time: 0.3750035762786865
+    GPU parallel time: 0.12497282028198242
 
-I7-7700HQ 2,8GHz
-CPU parallel time: 1.9070205688476562
-CPU parallel time: 1.579805850982666
+    i7-7700HQ 2,8GHz
+    CPU parallel time: 1.9070205688476562
+    CPU parallel time: 1.579805850982666
+    Sequentially time: 626.8048257827759
 
+    opencv.findContours time for sequential algorithm 1.552150011062622
+    opencv.findContours time for multiprocessing algorithm 2.5162086486816406
 
-Sequentially time: 626.8048257827759
+    i5-10210U 1.6GHz
+    CPU parallel time: 2.452546
+    CPU parallel time: 1.9995
+    Sequentially time: 641.2855
+ }
