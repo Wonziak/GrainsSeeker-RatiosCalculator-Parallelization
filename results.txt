@@ -25,9 +25,21 @@ picture 9600x9600 {
     GPU parallel time: 0.3468
 
     i5-6300HQ 2.30GHz - 2.8GHz
-    CPU parallel time: 3.446918487548828
-    CPU parallel time: 2.584380626678467
-    Sequentially time: 1113.3054127693176
+    CPU parallel time: 3.4469
+    CPU parallel time: 2.58438
+    Sequentially time: 1113.3054
     opencv.findContours time for sequential algorithm: 2.6448
     opencv.findContours time for multiprocessing algorithm: 4.45837
+
+    RTX 3070 Ti CUDA cores:  6144
+    GPU parallel time: 0.2279
+    GPU parallel time: 0.0519
+
+    Ryzen 5 5600X 3.7GHz - 4.55GHz
+    CPU parallel time: 0.431
+    CPU parallel time: 0.1839
+    Sequentially time: 487.9545
+    opencv.findContours time for sequential algorithm: 0.8187
+    opencv.findContours time for multiprocessing algorithm: 1.4139
+
  }
