@@ -18,7 +18,7 @@ if __name__ == '__main__':
     phase_layers = generate_binary_images(method="GPU")
     phase_layers = generate_binary_images(method="CPU")
     phase_layers = generate_binary_images(method="CPU")
-    phase_layers = generate_binary_images(method="SEQ")
+    # phase_layers = generate_binary_images(method="SEQ")
 
     find_contours(phase_layers)
     find_contours_threading(phase_layers)

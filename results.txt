@@ -42,4 +42,14 @@ picture 9600x9600 {
     opencv.findContours time for sequential algorithm: 0.8187
     opencv.findContours time for multiprocessing algorithm: 1.4139
 
+    RTX 3050 CUDA cores:  2048
+    GPU parallel time: 0.375
+    GPU parallel time: 0.1093
+
+    i5-11400H 2.7GHz - 4GHz
+    CPU parallel time: 0.9413
+    CPU parallel time: 0.6654
+    Sequentially time: 601.3083
+    opencv.findContours time for sequential algorithm: 1.0156
+    opencv.findContours time for multiprocessing algorithm: 1.9491
  }
