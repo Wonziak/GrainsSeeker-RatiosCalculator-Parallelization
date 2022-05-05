@@ -22,6 +22,8 @@ def __find_layers_sequentially(image, colors):
     phase_layers = {}
     start_time = time.time()
     for phase in colors.keys():
+        if phase in ImageConfig.background:
+            continue
         color = colors[phase]
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
         for i in range(ImageConfig.width):
@@ -44,6 +46,8 @@ def __find_layers_gpu(image, colors):
     blockspergrid = (blockspergrid_x, blockspergrid_y)
     start_time = time.time()
     for phase in colors.keys():
+        if phase in ImageConfig.background:
+            continue
         color = colors[phase]
         out_gpu = cuda.device_array_like(empty_array)
         __iterate_on_image_compare_color_cuda[blockspergrid, threadsperblock](x_gpu, color, out_gpu)
@@ -68,6 +72,8 @@ def __find_layers_cpu_parallel(image, colors):
     phase_layers = {}
     start_time = time.time()
     for phase in colors.keys():
+        if phase in ImageConfig.background:
+            continue
         color = colors[phase]
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
         __iterate_on_image_compare_color_cpu(image, ImageConfig.width, ImageConfig.height, layer, color)

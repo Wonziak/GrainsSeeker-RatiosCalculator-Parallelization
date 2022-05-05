@@ -2,7 +2,6 @@ import multiprocessing
 
 import cv2
 import time
-import threading
 from multiprocessing import Pool
 from Config.ImageConfig import ImageConfig
 

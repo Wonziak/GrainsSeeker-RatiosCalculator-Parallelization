@@ -10,9 +10,10 @@ class ImageConfig:
     colors_map = {}
     heightOffset = 0
     widthOffset = 0
+    background = []
 
     @staticmethod
-    def generate_image_info(image_path, colors_map=None):
+    def generate_image_info(image_path, colors_map=None, background=None):
         ImageConfig.image = cv2.imread(image_path)
         ImageConfig.imageCopy = ImageConfig.image
         ImageConfig.height, ImageConfig.width = ImageConfig.image.shape[:2]
@@ -25,6 +26,8 @@ class ImageConfig:
                 'bainite': (172, 255, 46),
                 'martensite': (255, 0, 0)
             }
+        if background:
+            ImageConfig.background = background
         ImageConfig.colorsNumber = len(ImageConfig.colors_map)
         ImageConfig.heightOffset = 0
         ImageConfig.widthOffset = 0

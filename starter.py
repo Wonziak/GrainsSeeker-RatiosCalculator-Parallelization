@@ -6,8 +6,8 @@ from countoursFinder import find_contours, find_contours_threading
 
 if __name__ == '__main__':
     devices_info()
-    image_path = 'RealImages/9600x9600.png'
-    # image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
+    # image_path = 'RealImages/9600x9600.png'
+    image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     # color_map = ImageConfig.colors_map = {
     #             'ferrite': (29, 143, 255),
     #             'bainite': (172, 255, 46),
@@ -22,25 +22,7 @@ if __name__ == '__main__':
 
     find_contours(phase_layers)
     find_contours_threading(phase_layers)
-    # show_layers(phase_layers)
-    # ratiosToCalculateList = ['Malinowska',
-    #                          'Blair Bliss',
-    #                          'Danielsson',
-    #                          'Haralick',
-    #                          'Mz',
-    #                          'RLS',
-    #                          'RF',
-    #                          'RC1',
-    #                          'RC2',
-    #                          'RCOM',
-    #                          'LP1',
-    #                          'LP2',
-    #                          'LP3',
-    #                          'curavture']
-    # statsRatiosToCalculateList = ['BorderNeighbour',
-    #                               'OnePointProbability',
-    #
-    #                               'Linealpath']
+
     colors = {
     'ferrite': (0, 255, 0),
     'bainite': (0, 0, 255),
