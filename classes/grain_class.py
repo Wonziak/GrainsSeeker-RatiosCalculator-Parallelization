@@ -8,9 +8,9 @@ class GrainClass(RatiosClass):
     def __init__(self, edge):
         self.edge = edge
         self.domain = []
-        self.perimeter = 0 # obwód - długość
+        self.perimeter = 0  # obwód - długość
         self.area = 0
-        #self.__get_area()
+        # self.__get_area()
         self.centerOfMass = []
         self.centerOfMassLocal = []
         self.distanceFromCenterPowerSum = 0
@@ -48,9 +48,21 @@ class GrainClass(RatiosClass):
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
         domain = []
-        for i in range(ImageConfig.width):
-            for j in range(ImageConfig.height):
+        width, height = self.__get_rectangle_containing_grain()
+        for i in range(width[0], width[1]):
+            for j in range(height[0], height[1]):
                 if cv2.pointPolygonTest(self.edge, (i, j), measureDist=False) >= 0:
                     domain.append([i, j])
         self.domain = domain
         self.area = len(self.domain)
+
+    def __get_rectangle_containing_grain(self):
+        most_left = tuple(self.edge[self.edge[:, :, 0].argmin()][0])[0]
+        most_right = tuple(self.edge[self.edge[:, :, 0].argmax()][0])[0]
+        width = (most_left, most_right)
+
+        most_up = tuple(self.edge[self.edge[:, :, 1].argmin()][0])[1]
+        most_down = tuple(self.edge[self.edge[:, :, 1].argmax()][0])[1]
+        height = (most_up, most_down)
+
+        return width, height

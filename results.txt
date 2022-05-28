@@ -41,6 +41,8 @@ picture 9600x9600 {
     Sequentially time: 487.9545
     opencv.findContours time for sequential algorithm: 0.8187
     opencv.findContours time for multiprocessing algorithm: 1.4139
+    Grains instances generator sequentially time is: 349.6848
+    Grains instances generator multiprocessing time is: 368.634
 
     RTX 3050 CUDA cores:  2048
     GPU parallel time: 0.375
