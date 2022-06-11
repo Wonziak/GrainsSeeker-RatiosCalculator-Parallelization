@@ -9,14 +9,14 @@ picture 9600x9600 {
     CPU parallel time: 1.5798
     Sequentially time: 626.8048
     opencv.findContours time for sequential algorithm: 1.5521
-    opencv.findContours time for multiprocessing algorithm: 2.5162
+    opencv.findContours time for multithreading algorithm: 2.5162
 
     i5-10210U 1.6GHz - 4GHz
     CPU parallel time: 2.4525
     CPU parallel time: 1.9995
     Sequentially time: 641.2855
     opencv.findContours time for sequential algorithm: 1.2028
-    opencv.findContours time for multiprocessing algorithm: 2.2026
+    opencv.findContours time for multithreading algorithm: 2.2026
 
 
     NVIDIA GeForce GTX 950M
@@ -29,7 +29,7 @@ picture 9600x9600 {
     CPU parallel time: 2.58438
     Sequentially time: 1113.3054
     opencv.findContours time for sequential algorithm: 2.6448
-    opencv.findContours time for multiprocessing algorithm: 4.45837
+    opencv.findContours time for multithreading algorithm: 4.45837
 
     RTX 3070 Ti CUDA cores:  6144
     GPU parallel time: 0.2279
@@ -40,11 +40,11 @@ picture 9600x9600 {
     CPU parallel time: 0.1839
     Sequentially time: 487.9545
     opencv.findContours time for sequential algorithm: 0.8187
-    opencv.findContours time for multiprocessing algorithm: 1.4139
+    opencv.findContours time for multithreading algorithm: 1.4139
     Grains instances generator sequentially time is: 349.6848 //picture 9kx9k
-    Grains instances generator multiprocessing time is: 368.634 //picture 9kx9k
+    Grains instances generator multithreading time is: 368.634 //picture 9kx9k
 
-    Grains instances generator and ratios calculating multiprocessing time is: 289.0689 //picture 800x800
+    Grains instances generator and ratios calculating multithreading time is: 289.0689 //picture 800x800
     Grains instances generator sequentially time and ratios calculating is: 366.3663    //picture 800x800
 
     RTX 3050 CUDA cores:  2048
@@ -56,7 +56,7 @@ picture 9600x9600 {
     CPU parallel time: 0.6654
     Sequentially time: 601.3083
     opencv.findContours time for sequential algorithm: 1.0156
-    opencv.findContours time for multiprocessing algorithm: 1.9491
+    opencv.findContours time for multithreading algorithm: 1.9491
 
     RTX 3090 CUDA cores:  10496
     GPU parallel time: 0.2199
@@ -67,5 +67,12 @@ picture 9600x9600 {
     CPU parallel time: 0.1570
     Sequentially time: 485.6985
     opencv.findContours time for sequential algorithm: 0.8751
-    opencv.findContours time for multiprocessing algorithm: 1.6671
+    opencv.findContours time for multithreading algorithm: 1.6671
  }
+
+
+
+Grains instances generator sequentially with gpu time is: 479.6453
+Grains instances generator multiprocessing time is: 385.1664
+Grains instances generator sequentially time is: 398.278028011322
+Grains instances generator multiprocessing with gpu time is: 451.3306

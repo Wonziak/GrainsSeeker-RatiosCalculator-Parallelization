@@ -1,4 +1,5 @@
 from classes.grain_class import GrainClass
+from classes.grain_gpu_class import GrainGPUClass
 from collections import defaultdict
 import time
 from multiprocessing import Pool, Manager
@@ -17,6 +18,23 @@ def generate_grains_instances_sequentially(contours: dict):
             grain.start_calculating()
             phase_grains_dict[phase].append(grain)
     print("Grains instances generator sequentially time is: " + str(time.time() - start_time))
+    for phase in phase_grains_dict:
+        print(phase)
+        print(len(phase_grains_dict[phase]))
+
+
+def generate_grains_instances_sequentially_gpu(contours: dict):
+    phase_grains_dict = defaultdict(list)
+    start_time = time.time()
+    for phase in contours:
+        for grain_contours in contours[phase]:
+            grain = GrainGPUClass(grain_contours, phase)
+            if grain.area <= grain.perimeter:
+                del grain
+                continue
+            grain.start_calculating()
+            phase_grains_dict[phase].append(grain)
+    print("Grains instances generator sequentially with gpu time is: " + str(time.time() - start_time))
     for phase in phase_grains_dict:
         print(phase)
         print(len(phase_grains_dict[phase]))
