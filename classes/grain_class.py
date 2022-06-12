@@ -40,7 +40,7 @@ class GrainClass(RatiosClass):
         self.__calculate_distances_sum_from_center()
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_min_from_center()
-        # self.__calculate_max_distance_in_grain()
+        self.__calculate_max_distance_in_grain()
         # self.__find_min_dist_dum()
         # self.__find_vector_perpendicular()
 

@@ -5,6 +5,7 @@ import cv2
 import math
 from numba import njit, cuda
 from classes.ratios_class import RatiosClass
+from collections import defaultdict
 
 
 class GrainGPUClass(RatiosClass):
@@ -14,6 +15,9 @@ class GrainGPUClass(RatiosClass):
         self.domain = []
         self.perimeter = len(edge)  # obwód - długość
         self.area = 0
+        self.width_range = ()
+        self.height_range = ()
+        self.__get_rectangle_containing_grain()
         self.__get_area()
         self.centerOfMass = []
         self.centerOfMassLocal = []
@@ -40,13 +44,14 @@ class GrainGPUClass(RatiosClass):
         self.__calculate_height_width()
         self.__calculate_distances_sum_from_each_point_to_center()
         self.__calculate_distances_from_edge_to_center()
-        # self.__calculate_max_distance_in_grain()
+        self.__calculate_max_distance_in_grain()
         # self.__find_min_dist_dum()
         # self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
         domain = []
-        width, height = self.__get_rectangle_containing_grain()
+        width = self.width_range
+        height = self.height_range
         for i in range(width[0], width[1]):
             for j in range(height[0], height[1]):
                 if cv2.pointPolygonTest(self.edge, (i, j), measureDist=False) >= 0:
@@ -69,8 +74,8 @@ class GrainGPUClass(RatiosClass):
 
         width = (min_x, max_x)
         height = (min_y, max_y)
-
-        return width, height
+        self.width_range = width
+        self.height_range = height
 
     def find_com(self, offsetX=0, offsetY=0):  # srodek ciezkosci
         allx = 0
