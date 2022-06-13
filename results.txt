@@ -41,11 +41,12 @@ picture 9600x9600 {
     Sequentially time: 487.9545
     opencv.findContours time for sequential algorithm: 0.8187
     opencv.findContours time for multithreading algorithm: 1.4139
-    Grains instances generator sequentially time is: 349.6848 //picture 9kx9k
-    Grains instances generator multithreading time is: 368.634 //picture 9kx9k
 
-    Grains instances generator and ratios calculating multithreading time is: 289.0689 //picture 800x800
-    Grains instances generator sequentially time and ratios calculating is: 366.3663    //picture 800x800
+    Grains instances generator sequentially with gpu time is: 784.6047 //picture 9kx9k
+    Grains instances generator multithreading time is: 421.7954 //picture 9kx9k
+    Grains instances generator sequentially time is: 438.1376 //picture 9kx9k
+    Grains instances generator multithreading with gpu time is: 592.2369 //picture 9kx9k
+
 
     RTX 3050 CUDA cores:  2048
     GPU parallel time: 0.375

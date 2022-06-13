@@ -1,11 +1,14 @@
-import numpy as np
-
-from config.image_config import ImageConfig
-import cv2
 import math
-from numba import njit, cuda
+
+import cv2
+import numpy as np
+from numba import cuda
+
 from classes.ratios_class import RatiosClass
-from collections import defaultdict
+from config.image_config import ImageConfig
+from functions_for_cuda import calculate_distance_sum_from_center_gpu, \
+    calculate_distance_from_center_to_edge_gpu, create_lists_of_xs_ys_edge_gpu, \
+    create_lists_of_xs_ys_domain_gpu
 
 
 class GrainGPUClass(RatiosClass):
@@ -41,7 +44,6 @@ class GrainGPUClass(RatiosClass):
         # self.calculateRatios()
 
     def __calculate_com_distances_height_width(self):
-        self.__calculate_height_width()
         self.__calculate_distances_sum_from_each_point_to_center()
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_distance_in_grain()
@@ -60,54 +62,47 @@ class GrainGPUClass(RatiosClass):
         self.area = len(self.domain)
 
     def __get_rectangle_containing_grain(self):
-        list_of_xs = []
-        list_of_ys = []
+        x_gpu = cuda.to_device(self.edge)
+        threads_per_block = 64
+        blocks_per_grid = 96
+        out_xs = cuda.device_array(shape=(len(self.edge)), dtype=np.int32)
+        out_ys = cuda.device_array(shape=(len(self.edge)), dtype=np.int32)
+        create_lists_of_xs_ys_edge_gpu[blocks_per_grid, threads_per_block](x_gpu, out_xs, out_ys)
+        list_of_xs = out_xs.copy_to_host()
+        list_of_ys = out_ys.copy_to_host()
+        cuda.synchronize()
+        max_x = int(max(list_of_xs))
+        min_x = int(min(list_of_xs))
 
-        for edge_point in self.edge:
-            list_of_xs.append(edge_point[0][0])
-            list_of_ys.append(edge_point[0][1])
-        max_x = max(list_of_xs)
-        min_x = min(list_of_xs)
-
-        max_y = max(list_of_ys)
-        min_y = min(list_of_ys)
+        max_y = int(max(list_of_ys))
+        min_y = int(min(list_of_ys))
 
         width = (min_x, max_x)
         height = (min_y, max_y)
         self.width_range = width
         self.height_range = height
-
-    def find_com(self, offsetX=0, offsetY=0):  # srodek ciezkosci
-        allx = 0
-        ally = 0
-        for i in range(self.area):
-            allx += self.domain[i][0]  # suma wspołrzędnych x pola
-            ally += self.domain[i][1]  # suma wspołrzędnych y pola
-        meanX = int(allx / self.area)
-        meanY = int(ally / self.area)
-        self.centerOfMass.append(meanX)
-        self.centerOfMass.append(meanY)
-        self.centerOfMassLocal.append(meanX - offsetX * ImageConfig.widthOffset)
-        self.centerOfMassLocal.append(meanY - offsetY * ImageConfig.heightOffset)
-
-    def __calculate_height_width(self):  # wysokosc i szerokosc
-        list_of_xs = []
-        list_of_ys = []
-
-        for edge_point in self.edge:
-            list_of_xs.append(edge_point[0][0])
-            list_of_ys.append(edge_point[0][1])
-        max_x = max(list_of_xs)
-        min_x = min(list_of_xs)
-
-        max_y = max(list_of_ys)
-        min_y = min(list_of_ys)
-
         x_dist = max_x - min_x
         y_dist = max_y - min_y
 
         self.LW = x_dist
         self.LH = y_dist
+
+    def find_com(self, offsetX=0, offsetY=0):  # srodek ciezkosci
+        empty_array = np.zeros(len(self.domain))
+        x_gpu = cuda.to_device(np.array(self.domain))
+        threads_per_block = 64
+        blocks_per_grid = 96
+        out_xs = cuda.device_array_like(empty_array)
+        out_ys = cuda.device_array_like(empty_array)
+        create_lists_of_xs_ys_domain_gpu[blocks_per_grid, threads_per_block](x_gpu, out_xs, out_ys)
+        cuda.synchronize()
+        meanX = out_xs.copy_to_host().mean()
+        meanY = out_ys.copy_to_host().mean()
+
+        self.centerOfMass.append(meanX)
+        self.centerOfMass.append(meanY)
+        self.centerOfMassLocal.append(meanX - offsetX * ImageConfig.widthOffset)
+        self.centerOfMassLocal.append(meanY - offsetY * ImageConfig.heightOffset)
 
     def __calculate_distances_sum_from_each_point_to_center(
             self):  # suma odleglosci od srodka ciezkosci, jeden to kazda odleglosc podniesiona do kwadratu
@@ -153,8 +148,9 @@ class GrainGPUClass(RatiosClass):
     def __calculate_max_distance_in_grain(self):  # najwięsza odleglość miedzy punktami ziarna
         maxdist = -1
         coordinates = [0, 0, 0, 0]
-        for edgePoint1 in self.edge:
-            for edgePoint2 in self.edge:
+        convex_hull = cv2.convexHull(self.edge)
+        for edgePoint1 in convex_hull:
+            for edgePoint2 in convex_hull:
                 if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
                     continue
                 x = (edgePoint2[0][0] - edgePoint1[0][0]) ** 2 + (
@@ -166,21 +162,6 @@ class GrainGPUClass(RatiosClass):
                     coordinates[2] = edgePoint2[0][0]  # x2
                     coordinates[3] = edgePoint2[0][1]  # y2
                     maxdist = dist
-
         self.maxDistancePoints = maxdist
         self.maxDistanceVectorCoords = [coordinates[2] - coordinates[0],
                                         coordinates[3] - coordinates[1]]
-
-
-@cuda.jit
-def calculate_distance_sum_from_center_gpu(domain, output, center_of_mass_0, center_of_mass_1):
-    i = cuda.grid(1)
-    output[i] = (center_of_mass_0 - domain[i][0]) ** 2 + (
-            center_of_mass_1 - domain[i][1]) ** 2
-
-
-@cuda.jit
-def calculate_distance_from_center_to_edge_gpu(edge, output, center_of_mass_0, center_of_mass_1):
-    i = cuda.grid(1)
-    output[i] = (center_of_mass_0 - edge[i][0][0]) ** 2 + (
-            center_of_mass_1 - edge[i][0][1]) ** 2

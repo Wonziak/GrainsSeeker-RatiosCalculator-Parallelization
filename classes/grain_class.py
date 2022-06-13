@@ -13,6 +13,9 @@ class GrainClass(RatiosClass):
         self.domain = []
         self.perimeter = len(edge)  # obwód - długość
         self.area = 0
+        self.width_range = ()
+        self.height_range = ()
+        self.__get_rectangle_containing_grain()
         self.__get_area()
         self.centerOfMass = []
         self.centerOfMassLocal = []
@@ -36,17 +39,18 @@ class GrainClass(RatiosClass):
         # self.calculateRatios()
 
     def __calculate_com_distances_height_width(self):
-        self.__calculate_height_width()
         self.__calculate_distances_sum_from_center()
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_min_from_center()
-        self.__calculate_max_distance_in_grain()
+        # self.__calculate_max_distance_in_grain()
+        self.__calculate_max_distance_in_grain_convexhull()
         # self.__find_min_dist_dum()
         # self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
         domain = []
-        width, height = self.__get_rectangle_containing_grain()
+        width = self.width_range
+        height = self.height_range
         for i in range(width[0], width[1]):
             for j in range(height[0], height[1]):
                 if cv2.pointPolygonTest(self.edge, (i, j), measureDist=False) >= 0:
@@ -61,16 +65,22 @@ class GrainClass(RatiosClass):
         for edge_point in self.edge:
             list_of_xs.append(edge_point[0][0])
             list_of_ys.append(edge_point[0][1])
-        max_x = max(list_of_xs)
-        min_x = min(list_of_xs)
+        max_x = int(max(list_of_xs))
+        min_x = int(min(list_of_xs))
 
-        max_y = max(list_of_ys)
-        min_y = min(list_of_ys)
+        max_y = int(max(list_of_ys))
+        min_y = int(min(list_of_ys))
 
         width = (min_x, max_x)
         height = (min_y, max_y)
 
-        return width, height
+        self.width_range = width
+        self.height_range = height
+        x_dist = max_x - min_x
+        y_dist = max_y - min_y
+
+        self.LW = x_dist
+        self.LH = y_dist
 
     def find_com(self, offsetX=0, offsetY=0):  # srodek ciezkosci
         allx = 0
@@ -118,22 +128,22 @@ class GrainClass(RatiosClass):
             self.minDistanceFromEgdeSum += mindist
             mindist = float('inf')
 
-    def __calculate_height_width(self):  # wysokosc i szerokosc
-
-        list_of_xs = [edge_point[0][0] for edge_point in self.edge]
-        list_of_ys = [edge_point[0][1] for edge_point in self.edge]
-
-        max_x = max(list_of_xs)
-        min_x = min(list_of_xs)
-
-        max_y = max(list_of_ys)
-        min_y = min(list_of_ys)
-
-        x_dist = max_x - min_x
-        y_dist = max_y - min_y
-
-        self.LW = x_dist
-        self.LH = y_dist
+    # def __calculate_height_width(self):  # wysokosc i szerokosc
+    #
+    #     list_of_xs = [edge_point[0][0] for edge_point in self.edge]
+    #     list_of_ys = [edge_point[0][1] for edge_point in self.edge]
+    #
+    #     max_x = max(list_of_xs)
+    #     min_x = min(list_of_xs)
+    #
+    #     max_y = max(list_of_ys)
+    #     min_y = min(list_of_ys)
+    #
+    #     x_dist = max_x - min_x
+    #     y_dist = max_y - min_y
+    #
+    #     self.LW = x_dist
+    #     self.LH = y_dist
 
     def __calculate_max_min_from_center(
             self):  # najwieszka i najmniejsza odleglosc miedzy srodkiem i krawedzia
@@ -166,7 +176,28 @@ class GrainClass(RatiosClass):
                     coordinates[2] = edgePoint2[0][0]  # x2
                     coordinates[3] = edgePoint2[0][1]  # y2
                     maxdist = dist
+        self.maxDistancePoints = maxdist
+        self.maxDistanceVectorCoords = [coordinates[2] - coordinates[0],
+                                        coordinates[3] - coordinates[1]]
 
+    def __calculate_max_distance_in_grain_convexhull(
+            self):  # najwięsza odleglość miedzy punktami ziarna
+        maxdist = -1
+        coordinates = [0, 0, 0, 0]
+        convex_hull = cv2.convexHull(self.edge)
+        for edgePoint1 in convex_hull:
+            for edgePoint2 in convex_hull:
+                if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
+                    continue
+                x = (edgePoint2[0][0] - edgePoint1[0][0]) ** 2 + (
+                        edgePoint2[0][1] - edgePoint1[0][1]) ** 2
+                dist = math.sqrt(x)
+                if dist > maxdist:
+                    coordinates[0] = edgePoint1[0][0]  # x1
+                    coordinates[1] = edgePoint1[0][1]  # y1
+                    coordinates[2] = edgePoint2[0][0]  # x2
+                    coordinates[3] = edgePoint2[0][1]  # y2
+                    maxdist = dist
         self.maxDistancePoints = maxdist
         self.maxDistanceVectorCoords = [coordinates[2] - coordinates[0],
                                         coordinates[3] - coordinates[1]]
