@@ -4,11 +4,13 @@ from config.devices_info import devices_info
 from contours_finder import find_contours, find_contours_threading
 from grain_instances_generator import generate_grains_instances_sequentially, \
     generate_grains_instances_threading, generate_grains_instances_sequentially_gpu, \
-    generate_grains_instances_threading_with_gpu
+    generate_grains_instances_threading_with_gpu, \
+    generate_grains_instances_sequentially_with_parallel_calculations_cpu, \
+    generate_grains_instances_threading_with_numba_cpu
 
 if __name__ == '__main__':
     devices_info()
-    image_path = 'RealImages/DP800-bigger.png'
+    image_path = 'RealImages/DP800-800x800.png'
     # image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     # color_map = ImageConfig.colors_map = {
     #             'ferrite': (29, 143, 255),
@@ -26,9 +28,15 @@ if __name__ == '__main__':
     find_contours_threading(phase_layers)
 
     generate_grains_instances_sequentially_gpu(contours)
+    generate_grains_instances_sequentially_gpu(contours)
     generate_grains_instances_threading(contours)
     generate_grains_instances_sequentially(contours)
     generate_grains_instances_threading_with_gpu(contours)
+    generate_grains_instances_threading_with_gpu(contours)
+    generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
+    generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
+    generate_grains_instances_threading_with_numba_cpu(contours)
+    generate_grains_instances_threading_with_numba_cpu(contours)
 
     colors = {
         'ferrite': (0, 255, 0),
