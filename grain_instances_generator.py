@@ -15,14 +15,13 @@ def generate_grains_instances_sequentially(contours: dict):
         for grain_contours in contours[phase]:
             grain = GrainClass(grain_contours, phase)
             if grain.area <= grain.perimeter:
-                del grain
                 continue
             grain.start_calculating()
             phase_grains_dict[phase].append(grain)
     print("Grains instances generator sequentially time is: " + str(time.time() - start_time))
-    # for phase in phase_grains_dict:
-    #     print(phase)
-    #     print(len(phase_grains_dict[phase]))
+    for phase in phase_grains_dict:
+        print(phase)
+        print(len(phase_grains_dict[phase]))
 
 
 def generate_grains_instances_sequentially_gpu(contours: dict):
@@ -32,7 +31,6 @@ def generate_grains_instances_sequentially_gpu(contours: dict):
         for grain_contours in contours[phase]:
             grain = GrainGPUClass(grain_contours, phase)
             if grain.area <= grain.perimeter:
-                del grain
                 continue
             grain.start_calculating()
             phase_grains_dict[phase].append(grain)
@@ -66,7 +64,6 @@ def parallel_instances_generator(phase_grains_list: list, phase_grains_contours:
     for grain_contours in phase_grains_contours:
         grain = GrainClass(grain_contours, phase)
         if grain.area <= grain.perimeter:
-            del grain
             continue
         grain.start_calculating()
         phase_grains_list.append(grain)
@@ -100,14 +97,15 @@ def generate_grains_instances_sequentially_with_parallel_calculations_cpu(contou
         for grain_contours in contours[phase]:
             grain = GrainCPUClass(grain_contours, phase)
             if grain.area <= grain.perimeter:
-                del grain
                 continue
             grain.start_calculating()
             phase_grains_dict[phase].append(grain)
     print(
         "Grains instances generator sequentially with parallel calculations on CPU time is: " + str(
             time.time() - start_time))
-
+    # for phase in phase_grains_dict:
+    #     print(phase)
+    #     print(len(phase_grains_dict[phase]))
 
 # This functions do not work because of type limitations of numba
 # def generate_grain_instances_threads_per_grain(contours: dict):
@@ -145,14 +143,15 @@ def generate_grains_instances_threading_with_numba_cpu(contours: dict):
 
     print("Grains instances generator multithreading with numba cpu time is: " + str(
         time.time() - start_time))
-
+    # for phase in phase_grains_dict:
+    #     print(phase)
+    #     print(len(phase_grains_dict[phase]))
 
 def parallel_instances_generator_with_numba(phase_grains_list: list, phase_grains_contours: list,
                                             phase: str):
     for grain_contours in phase_grains_contours:
         grain = GrainCPUClass(grain_contours, phase)
         if grain.area <= grain.perimeter:
-            del grain
             continue
         grain.start_calculating()
         phase_grains_list.append(grain)
@@ -164,7 +163,6 @@ def parallel_instances_generator_with_gpu(phase_grains_list: list, phase_grains_
     for grain_contours in phase_grains_contours:
         grain = GrainGPUClass(grain_contours, phase)
         if grain.area <= grain.perimeter:
-            del grain
             continue
         grain.start_calculating()
         phase_grains_list.append(grain)

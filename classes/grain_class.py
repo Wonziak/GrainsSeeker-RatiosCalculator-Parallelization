@@ -128,23 +128,6 @@ class GrainClass(RatiosClass):
             self.minDistanceFromEgdeSum += mindist
             mindist = float('inf')
 
-    # def __calculate_height_width(self):  # wysokosc i szerokosc
-    #
-    #     list_of_xs = [edge_point[0][0] for edge_point in self.edge]
-    #     list_of_ys = [edge_point[0][1] for edge_point in self.edge]
-    #
-    #     max_x = max(list_of_xs)
-    #     min_x = min(list_of_xs)
-    #
-    #     max_y = max(list_of_ys)
-    #     min_y = min(list_of_ys)
-    #
-    #     x_dist = max_x - min_x
-    #     y_dist = max_y - min_y
-    #
-    #     self.LW = x_dist
-    #     self.LH = y_dist
-
     def __calculate_max_min_from_center(
             self):  # najwieszka i najmniejsza odleglosc miedzy srodkiem i krawedzia
         maxdist = -1

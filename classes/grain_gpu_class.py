@@ -165,3 +165,16 @@ class GrainGPUClass(RatiosClass):
         self.maxDistancePoints = maxdist
         self.maxDistanceVectorCoords = [coordinates[2] - coordinates[0],
                                         coordinates[3] - coordinates[1]]
+
+    def __find_min_dist_dum(self):  # suma minimalnych odleglosc od krawedzi
+        mindist = float('inf')
+        for areaPoint in self.domain:
+            for edgePoint in self.edge:
+                if areaPoint[0] == edgePoint[0][0] and areaPoint[1] == edgePoint[0][1]:
+                    continue
+                x = (edgePoint[0][0] - areaPoint[0]) ** 2 + (edgePoint[0][1] - areaPoint[0]) ** 2
+                dist = math.sqrt(x)
+                if dist < mindist:
+                    mindist = dist
+            self.minDistanceFromEgdeSum += mindist
+            mindist = float('inf')

@@ -46,6 +46,7 @@ picture 9600x9600 {
     Grains instances generator multithreading time is: 421.7954 //picture 9kx9k
     Grains instances generator sequentially time is: 438.1376 //picture 9kx9k
     Grains instances generator multithreading with gpu time is: 592.2369 //picture 9kx9k
+    Grains instances generator multithreading with numba cpu time is: 520.6352 //picture 9kx9k
 
 
     RTX 3050 CUDA cores:  2048
