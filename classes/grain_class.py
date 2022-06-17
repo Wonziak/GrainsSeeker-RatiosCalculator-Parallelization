@@ -44,7 +44,7 @@ class GrainClass(RatiosClass):
         self.__calculate_max_min_from_center()
         # self.__calculate_max_distance_in_grain()
         self.__calculate_max_distance_in_grain_convexhull()
-        # self.__find_min_dist_dum()
+        self.__find_min_dist_dum()
         # self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow

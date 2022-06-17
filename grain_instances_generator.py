@@ -19,9 +19,9 @@ def generate_grains_instances_sequentially(contours: dict):
             grain.start_calculating()
             phase_grains_dict[phase].append(grain)
     print("Grains instances generator sequentially time is: " + str(time.time() - start_time))
-    for phase in phase_grains_dict:
-        print(phase)
-        print(len(phase_grains_dict[phase]))
+    # for phase in phase_grains_dict:
+    #     print(phase)
+    #     print(len(phase_grains_dict[phase]))
 
 
 def generate_grains_instances_sequentially_gpu(contours: dict):

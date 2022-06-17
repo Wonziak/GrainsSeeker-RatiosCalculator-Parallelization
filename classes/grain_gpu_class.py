@@ -8,7 +8,7 @@ from classes.ratios_class import RatiosClass
 from config.image_config import ImageConfig
 from functions_for_cuda import calculate_distance_sum_from_center_gpu, \
     calculate_distance_from_center_to_edge_gpu, create_lists_of_xs_ys_edge_gpu, \
-    create_lists_of_xs_ys_domain_gpu
+    create_lists_of_xs_ys_domain_gpu, get_sum_of_minimal_distance_from_each_point_to_edge
 
 
 class GrainGPUClass(RatiosClass):
@@ -47,7 +47,7 @@ class GrainGPUClass(RatiosClass):
         self.__calculate_distances_sum_from_each_point_to_center()
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_distance_in_grain()
-        # self.__find_min_dist_dum()
+        self.__find_min_dist_dum()
         # self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
@@ -167,14 +167,13 @@ class GrainGPUClass(RatiosClass):
                                         coordinates[3] - coordinates[1]]
 
     def __find_min_dist_dum(self):  # suma minimalnych odleglosc od krawedzi
-        mindist = float('inf')
+        distances = np.zeros(len(self.domain))
+        x_gpu = cuda.to_device(np.array(self.edge))
+        threads_per_block = 64
+        blocks_per_grid = 96
+        out_gpu = cuda.device_array_like(distances)
         for areaPoint in self.domain:
-            for edgePoint in self.edge:
-                if areaPoint[0] == edgePoint[0][0] and areaPoint[1] == edgePoint[0][1]:
-                    continue
-                x = (edgePoint[0][0] - areaPoint[0]) ** 2 + (edgePoint[0][1] - areaPoint[0]) ** 2
-                dist = math.sqrt(x)
-                if dist < mindist:
-                    mindist = dist
-            self.minDistanceFromEgdeSum += mindist
-            mindist = float('inf')
+            get_sum_of_minimal_distance_from_each_point_to_edge[blocks_per_grid, threads_per_block] \
+                (x_gpu, out_gpu, areaPoint[0], areaPoint[1])
+            cuda.synchronize()
+            self.minDistanceFromEgdeSum += min(out_gpu.copy_to_host())

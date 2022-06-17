@@ -35,3 +35,12 @@ def create_lists_of_xs_ys_domain_gpu(domain, xs, ys):
     for i in range(start, len(domain), stride):
         xs[i] = domain[i][0]
         ys[i] = domain[i][1]
+
+
+@cuda.jit
+def get_sum_of_minimal_distance_from_each_point_to_edge(edge, distances, domain_x, domain_y):
+    start = cuda.grid(1)
+    stride = cuda.gridsize(1)
+    for i in range(start, len(edge), stride):
+        if edge[i][0][0] == domain_x and edge[i][0][1] == domain_y:
+            distances[i] = (edge[i][0][0] - domain_x) ** 2 + (edge[i][0][1] - domain_y) ** 2
