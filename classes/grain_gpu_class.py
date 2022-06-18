@@ -28,7 +28,7 @@ class GrainGPUClass(RatiosClass):
         self.distanceFromCenter = 0
         self.distanceFromEdgeToCenter = 0
         self.distanceFromEdgeToCenterSquared = 0
-        self.minDistanceFromEgdeSum = 0
+        self.minDistanceFromEdgeSum = 0
         self.minDistaceCenterEdge = 0
         self.maxDistaceCenterEdge = 0
         self.maxDistancePoints = 0
@@ -47,7 +47,7 @@ class GrainGPUClass(RatiosClass):
         self.__calculate_distances_sum_from_each_point_to_center()
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_distance_in_grain()
-        self.__find_min_dist_dum()
+        self.__find_min_dist_sum()
         # self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
@@ -126,11 +126,11 @@ class GrainGPUClass(RatiosClass):
         This function finds sum of distances from edge to center of mass. One distance is not rooted.
         Additionally finds max and min distances.
         """
-        empty_array = np.zeros(len(self.edge))
+        distances = np.zeros(len(self.edge))
         x_gpu = cuda.to_device(np.array(self.edge))
         threads_per_block = 64
         blocks_per_grid = 96
-        out_gpu = cuda.device_array_like(empty_array)
+        out_gpu = cuda.device_array_like(distances)
         calculate_distance_from_center_to_edge_gpu[blocks_per_grid, threads_per_block](x_gpu,
                                                                                        out_gpu,
                                                                                        self.centerOfMass[
@@ -138,10 +138,10 @@ class GrainGPUClass(RatiosClass):
                                                                                        self.centerOfMass[
                                                                                            1])
         cuda.synchronize()
-        empty_array = out_gpu.copy_to_host()
-        list_of_distances = list(map(math.sqrt, empty_array))
-        self.distanceFromEdgeToCenter = sum(empty_array)
-        self.distanceFromEdgeToCenterSquared = sum(list_of_distances)
+        distances = out_gpu.copy_to_host()
+        list_of_distances = list(map(math.sqrt, distances))
+        self.distanceFromEdgeToCenter = sum(list_of_distances)
+        self.distanceFromEdgeToCenterSquared = sum(distances)
         self.maxDistaceCenterEdge = max(list_of_distances)
         self.minDistaceCenterEdge = min(list_of_distances)
 
@@ -166,14 +166,14 @@ class GrainGPUClass(RatiosClass):
         self.maxDistanceVectorCoords = [coordinates[2] - coordinates[0],
                                         coordinates[3] - coordinates[1]]
 
-    def __find_min_dist_dum(self):  # suma minimalnych odleglosc od krawedzi
-        distances = np.zeros(len(self.domain))
+    def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
         x_gpu = cuda.to_device(np.array(self.edge))
-        threads_per_block = 64
+        threads_per_block = 96
         blocks_per_grid = 96
-        out_gpu = cuda.device_array_like(distances)
         for areaPoint in self.domain:
+            out_gpu = cuda.device_array_like(np.zeros(len(self.edge)))
             get_sum_of_minimal_distance_from_each_point_to_edge[blocks_per_grid, threads_per_block] \
                 (x_gpu, out_gpu, areaPoint[0], areaPoint[1])
             cuda.synchronize()
-            self.minDistanceFromEgdeSum += min(out_gpu.copy_to_host())
+            distances = out_gpu.copy_to_host()
+            self.minDistanceFromEdgeSum += min(distances)

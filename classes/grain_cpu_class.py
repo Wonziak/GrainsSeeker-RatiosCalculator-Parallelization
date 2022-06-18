@@ -7,7 +7,8 @@ from numba import cuda
 from classes.ratios_class import RatiosClass
 from config.image_config import ImageConfig
 from functions_for_cpu import create_lists_of_xs_ys_edge_cpu, create_lists_of_xs_ys_domain_cpu, \
-    calculate_distance_sum_from_center_cpu, calculate_distance_from_center_to_edge_cpu
+    calculate_distance_sum_from_center_cpu, calculate_distance_from_center_to_edge_cpu, \
+    get_sum_of_minimal_distance_from_each_point_to_edge_cpu
 
 
 class GrainCPUClass(RatiosClass):
@@ -27,7 +28,7 @@ class GrainCPUClass(RatiosClass):
         self.distanceFromCenter = 0
         self.distanceFromEdgeToCenter = 0
         self.distanceFromEdgeToCenterSquared = 0
-        self.minDistanceFromEgdeSum = 0
+        self.minDistanceFromEdgeSum = 0
         self.minDistaceCenterEdge = 0
         self.maxDistaceCenterEdge = 0
         self.maxDistancePoints = 0
@@ -46,7 +47,7 @@ class GrainCPUClass(RatiosClass):
         self.__calculate_distances_sum_from_each_point_to_center()
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_distance_in_grain()
-        # self.__find_min_dist_dum()
+        self.__find_min_dist_sum()
         # self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
@@ -107,8 +108,8 @@ class GrainCPUClass(RatiosClass):
         distances = calculate_distance_from_center_to_edge_cpu(self.edge, self.centerOfMass[0],
                                                                self.centerOfMass[1])
         list_of_distances = list(map(math.sqrt, distances))
-        self.distanceFromEdgeToCenter = sum(distances)
-        self.distanceFromEdgeToCenterSquared = sum(list_of_distances)
+        self.distanceFromEdgeToCenter = sum(list_of_distances)
+        self.distanceFromEdgeToCenterSquared = sum(distances)
         self.maxDistaceCenterEdge = max(list_of_distances)
         self.minDistaceCenterEdge = min(list_of_distances)
 
@@ -132,3 +133,9 @@ class GrainCPUClass(RatiosClass):
         self.maxDistancePoints = maxdist
         self.maxDistanceVectorCoords = [coordinates[2] - coordinates[0],
                                         coordinates[3] - coordinates[1]]
+
+    def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
+        sum_of_distances = get_sum_of_minimal_distance_from_each_point_to_edge_cpu(
+            np.array(self.domain),
+            self.edge)
+        self.minDistanceFromEdgeSum = sum_of_distances

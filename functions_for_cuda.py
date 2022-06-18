@@ -1,3 +1,5 @@
+import math
+
 from numba import cuda
 
 
@@ -43,4 +45,6 @@ def get_sum_of_minimal_distance_from_each_point_to_edge(edge, distances, domain_
     stride = cuda.gridsize(1)
     for i in range(start, len(edge), stride):
         if edge[i][0][0] == domain_x and edge[i][0][1] == domain_y:
-            distances[i] = (edge[i][0][0] - domain_x) ** 2 + (edge[i][0][1] - domain_y) ** 2
+            continue
+        distances[i] = math.sqrt(
+            math.pow(edge[i][0][0] - domain_x, 2) + math.pow(edge[i][0][1] - domain_y, 2))

@@ -23,7 +23,7 @@ class GrainClass(RatiosClass):
         self.distanceFromCenter = 0
         self.distanceFromEdgeToCenter = 0
         self.distanceFromEdgeToCenterSquared = 0
-        self.minDistanceFromEgdeSum = 0
+        self.minDistanceFromEdgeSum = 0
         self.minDistaceCenterEdge = 0
         self.maxDistaceCenterEdge = 0
         self.maxDistancePoints = 0
@@ -44,7 +44,7 @@ class GrainClass(RatiosClass):
         self.__calculate_max_min_from_center()
         # self.__calculate_max_distance_in_grain()
         self.__calculate_max_distance_in_grain_convexhull()
-        self.__find_min_dist_dum()
+        self.__find_min_dist_sum()
         # self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
@@ -115,17 +115,17 @@ class GrainClass(RatiosClass):
         self.distanceFromEdgeToCenter = distanceSum
         self.distanceFromEdgeToCenterSquared = distanceSumPower
 
-    def __find_min_dist_dum(self):  # suma minimalnych odleglosc od krawedzi
+    def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
         mindist = float('inf')
         for areaPoint in self.domain:
             for edgePoint in self.edge:
                 if areaPoint[0] == edgePoint[0][0] and areaPoint[1] == edgePoint[0][1]:
                     continue
-                x = (edgePoint[0][0] - areaPoint[0]) ** 2 + (edgePoint[0][1] - areaPoint[0]) ** 2
+                x = (edgePoint[0][0] - areaPoint[0]) ** 2 + (edgePoint[0][1] - areaPoint[1]) ** 2
                 dist = math.sqrt(x)
                 if dist < mindist:
                     mindist = dist
-            self.minDistanceFromEgdeSum += mindist
+            self.minDistanceFromEdgeSum += mindist
             mindist = float('inf')
 
     def __calculate_max_min_from_center(

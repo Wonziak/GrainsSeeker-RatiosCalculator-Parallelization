@@ -31,8 +31,8 @@ if __name__ == '__main__':
     generate_grains_instances_threading(contours)
     generate_grains_instances_sequentially(contours)
     generate_grains_instances_threading_with_gpu(contours)
-    # generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
-    # generate_grains_instances_threading_with_numba_cpu(contours)
+    generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
+    generate_grains_instances_threading_with_numba_cpu(contours)
     # generate_grain_instances_threads_per_grain(contours)
     colors = {
         'ferrite': (0, 255, 0),
