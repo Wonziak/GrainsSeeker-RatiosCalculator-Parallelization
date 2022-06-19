@@ -112,6 +112,7 @@ def generate_grains_instances_sequentially_with_parallel_calculations_cpu(contou
     #     print(len(phase_grains_dict[phase]))
     save_to_file("parallel_numba.txt", phase_grains_dict)
 
+
 # This functions do not work because of type limitations of numba
 # def generate_grain_instances_threads_per_grain(contours: dict):
 #     start_time = time.time()
@@ -186,7 +187,6 @@ def save_to_file(file_name, phase_grains_dict):
                 file.write(str(grain.centerOfMass) + "\n")
                 file.write(str(grain.centerOfMassLocal) + "\n")
                 file.write(str(grain.distanceFromCenterPowerSum) + "\n")
-                file.write(str(grain.distanceFromCenter) + "\n")
                 file.write(str(grain.distanceFromEdgeToCenter) + "\n")
                 file.write(str(grain.distanceFromEdgeToCenterSquared) + "\n")
                 file.write(str(grain.minDistanceFromEdgeSum) + "\n")
@@ -196,3 +196,4 @@ def save_to_file(file_name, phase_grains_dict):
                 file.write(str(grain.maxDistanceVectorCoords) + "\n")
                 file.write(str(grain.LH) + "\n")
                 file.write(str(grain.LW) + "\n")
+                file.write((str(grain.VectorPerpendicularLength)) + "\n" + "\n")

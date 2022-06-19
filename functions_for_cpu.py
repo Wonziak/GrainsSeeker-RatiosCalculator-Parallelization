@@ -52,3 +52,23 @@ def get_sum_of_minimal_distance_from_each_point_to_edge_cpu(domain, edge):
                                                                      2))
         sum_of_minimal_distances += min(list_of_distances)
     return sum_of_minimal_distances
+
+
+@njit(parallel=True)
+def get_all_perpendicular_vectors_length_cpu(edge, max_distance_vector_x,
+                                             max_distance_vector_y):
+    vector = np.zeros(2)
+    all_lengths = np.zeros(len(edge))
+    for i in prange(len(edge)):
+        lengths_for_point = np.zeros(len(edge))
+        for j in prange(len(edge)):
+            if edge[j][0][0] == edge[i][0][0] and edge[j][0][1] == edge[i][0][1]:
+                continue
+            vector[0] = int(edge[i][0][0] - edge[j][0][0])
+            vector[1] = int(edge[i][0][1] - edge[j][0][1])
+            if ((vector[0] * max_distance_vector_x) + (
+                    vector[1] * max_distance_vector_y)) == 0:
+                lengths_for_point[j] = (math.sqrt(math.pow(vector[0], 2) + math.pow(vector[1], 2)))
+        all_lengths[i] = np.amax(lengths_for_point)
+
+    return np.amax(all_lengths)

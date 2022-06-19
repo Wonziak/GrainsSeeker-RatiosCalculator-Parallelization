@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 from numba import cuda
 
 
@@ -40,11 +41,26 @@ def create_lists_of_xs_ys_domain_gpu(domain, xs, ys):
 
 
 @cuda.jit
-def get_sum_of_minimal_distance_from_each_point_to_edge(edge, distances, domain_x, domain_y):
+def get_sum_of_minimal_distance_from_each_point_to_edge(edge, distances, x, y):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
     for i in range(start, len(edge), stride):
-        if edge[i][0][0] == domain_x and edge[i][0][1] == domain_y:
+        if edge[i][0][0] == x and edge[i][0][1] == y:
             continue
         distances[i] = math.sqrt(
-            math.pow(edge[i][0][0] - domain_x, 2) + math.pow(edge[i][0][1] - domain_y, 2))
+            math.pow(edge[i][0][0] - x, 2) + math.pow(edge[i][0][1] - y, 2))
+
+
+@cuda.jit
+def get_all_perpendicular_vectors_length(edge, vector, distances, x, y, max_distance_vector_x,
+                                         max_distance_vector_y):
+    start = cuda.grid(1)
+    stride = cuda.gridsize(1)
+    for i in range(start, len(edge), stride):
+        if edge[i][0][0] == x and edge[i][0][1] == y:
+            continue
+        vector[0] = int(x - edge[i][0][0])
+        vector[1] = int(y - edge[i][0][1])
+        if ((vector[0] * max_distance_vector_x) + (
+                vector[1] * max_distance_vector_y)) == 0:
+            distances[i] = (math.sqrt(math.pow(vector[0], 2) + math.pow(vector[1], 2)))

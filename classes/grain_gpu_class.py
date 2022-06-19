@@ -8,7 +8,8 @@ from classes.ratios_class import RatiosClass
 from config.image_config import ImageConfig
 from functions_for_cuda import calculate_distance_sum_from_center_gpu, \
     calculate_distance_from_center_to_edge_gpu, create_lists_of_xs_ys_edge_gpu, \
-    create_lists_of_xs_ys_domain_gpu, get_sum_of_minimal_distance_from_each_point_to_edge
+    create_lists_of_xs_ys_domain_gpu, get_sum_of_minimal_distance_from_each_point_to_edge, \
+    get_all_perpendicular_vectors_length
 
 
 class GrainGPUClass(RatiosClass):
@@ -20,12 +21,11 @@ class GrainGPUClass(RatiosClass):
         self.area = 0
         self.width_range = ()
         self.height_range = ()
-        self.__get_rectangle_containing_grain()
-        self.__get_area()
+        self.LH = -10
+        self.LW = -10
         self.centerOfMass = []
         self.centerOfMassLocal = []
         self.distanceFromCenterPowerSum = 0
-        self.distanceFromCenter = 0
         self.distanceFromEdgeToCenter = 0
         self.distanceFromEdgeToCenterSquared = 0
         self.minDistanceFromEdgeSum = 0
@@ -34,8 +34,8 @@ class GrainGPUClass(RatiosClass):
         self.maxDistancePoints = 0
         self.maxDistanceVectorCoords = []
         self.VectorPerpendicularLength = 0
-        self.LH = -10
-        self.LW = -10
+        self.__get_rectangle_containing_grain()
+        self.__get_area()
         super().__init__()
 
     def start_calculating(self):
@@ -48,7 +48,7 @@ class GrainGPUClass(RatiosClass):
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_distance_in_grain()
         self.__find_min_dist_sum()
-        # self.__find_vector_perpendicular()
+        self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
         domain = []
@@ -177,3 +177,17 @@ class GrainGPUClass(RatiosClass):
             cuda.synchronize()
             distances = out_gpu.copy_to_host()
             self.minDistanceFromEdgeSum += min(distances)
+
+    def __find_vector_perpendicular(self):
+        x_gpu = cuda.to_device(np.array(self.edge))
+        threads_per_block = 96
+        blocks_per_grid = 96
+        list_of_distances = []
+        vector = cuda.to_device(np.zeros(2))
+        for edgePoint1 in self.edge:
+            distances = cuda.device_array_like(np.zeros(len(self.edge)))
+            get_all_perpendicular_vectors_length[blocks_per_grid, threads_per_block] \
+                (x_gpu, vector, distances, edgePoint1[0][0], edgePoint1[0][1],
+                 self.maxDistanceVectorCoords[0], self.maxDistanceVectorCoords[1])
+            list_of_distances.append(max(distances.copy_to_host()))
+        self.VectorPerpendicularLength = max(list_of_distances)

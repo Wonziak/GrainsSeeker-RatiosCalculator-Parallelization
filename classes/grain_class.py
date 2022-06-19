@@ -15,12 +15,11 @@ class GrainClass(RatiosClass):
         self.area = 0
         self.width_range = ()
         self.height_range = ()
-        self.__get_rectangle_containing_grain()
-        self.__get_area()
+        self.LH = -10
+        self.LW = -10
         self.centerOfMass = []
         self.centerOfMassLocal = []
         self.distanceFromCenterPowerSum = 0
-        self.distanceFromCenter = 0
         self.distanceFromEdgeToCenter = 0
         self.distanceFromEdgeToCenterSquared = 0
         self.minDistanceFromEdgeSum = 0
@@ -29,8 +28,8 @@ class GrainClass(RatiosClass):
         self.maxDistancePoints = 0
         self.maxDistanceVectorCoords = []
         self.VectorPerpendicularLength = 0
-        self.LH = -10
-        self.LW = -10
+        self.__get_rectangle_containing_grain()
+        self.__get_area()
         super().__init__()
 
     def start_calculating(self):
@@ -45,7 +44,7 @@ class GrainClass(RatiosClass):
         # self.__calculate_max_distance_in_grain()
         self.__calculate_max_distance_in_grain_convexhull()
         self.__find_min_dist_sum()
-        # self.__find_vector_perpendicular()
+        self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
         domain = []
@@ -194,7 +193,8 @@ class GrainClass(RatiosClass):
                 if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
                     continue
                 vec = [edgePoint2[0][0] - edgePoint1[0][0], edgePoint2[0][1] - edgePoint1[0][1]]
+
                 if ((vec[0] * self.maxDistanceVectorCoords[0]) + (
-                        vec[0] * self.maxDistanceVectorCoords[1])) == 0:
-                    dst.append(math.sqrt(vec[0] ** 2 + vec[1] ** 2))
+                        vec[1] * self.maxDistanceVectorCoords[1])) == 0:
+                    dst.append(math.sqrt(math.pow(vec[0], 2) + math.pow(vec[1], 2)))
         self.VectorPerpendicularLength = max(dst)

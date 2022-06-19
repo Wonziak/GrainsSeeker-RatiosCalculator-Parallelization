@@ -2,13 +2,13 @@ import math
 
 import cv2
 import numpy as np
-from numba import cuda
 
 from classes.ratios_class import RatiosClass
 from config.image_config import ImageConfig
 from functions_for_cpu import create_lists_of_xs_ys_edge_cpu, create_lists_of_xs_ys_domain_cpu, \
     calculate_distance_sum_from_center_cpu, calculate_distance_from_center_to_edge_cpu, \
-    get_sum_of_minimal_distance_from_each_point_to_edge_cpu
+    get_sum_of_minimal_distance_from_each_point_to_edge_cpu, \
+    get_all_perpendicular_vectors_length_cpu
 
 
 class GrainCPUClass(RatiosClass):
@@ -20,12 +20,11 @@ class GrainCPUClass(RatiosClass):
         self.area = 0
         self.width_range = ()
         self.height_range = ()
-        self.__get_rectangle_containing_grain()
-        self.__get_area()
+        self.LH = -10
+        self.LW = -10
         self.centerOfMass = []
         self.centerOfMassLocal = []
         self.distanceFromCenterPowerSum = 0
-        self.distanceFromCenter = 0
         self.distanceFromEdgeToCenter = 0
         self.distanceFromEdgeToCenterSquared = 0
         self.minDistanceFromEdgeSum = 0
@@ -34,8 +33,8 @@ class GrainCPUClass(RatiosClass):
         self.maxDistancePoints = 0
         self.maxDistanceVectorCoords = []
         self.VectorPerpendicularLength = 0
-        self.LH = -10
-        self.LW = -10
+        self.__get_rectangle_containing_grain()
+        self.__get_area()
         super().__init__()
 
     def start_calculating(self):
@@ -48,7 +47,7 @@ class GrainCPUClass(RatiosClass):
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_distance_in_grain()
         self.__find_min_dist_sum()
-        # self.__find_vector_perpendicular()
+        self.__find_vector_perpendicular()
 
     def __get_area(self):  # powierzchnia to domain(współrzędne), area to ilosc punktow
         domain = []
@@ -135,7 +134,13 @@ class GrainCPUClass(RatiosClass):
                                         coordinates[3] - coordinates[1]]
 
     def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
-        sum_of_distances = get_sum_of_minimal_distance_from_each_point_to_edge_cpu(
-            np.array(self.domain),
-            self.edge)
+        sum_of_distances = \
+            get_sum_of_minimal_distance_from_each_point_to_edge_cpu(np.array(self.domain),
+                                                                    self.edge)
         self.minDistanceFromEdgeSum = sum_of_distances
+
+    def __find_vector_perpendicular(self):
+        self.VectorPerpendicularLength = \
+            get_all_perpendicular_vectors_length_cpu(self.edge,
+                                                     self.maxDistanceVectorCoords[0],
+                                                     self.maxDistanceVectorCoords[1])
