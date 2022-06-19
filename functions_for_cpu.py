@@ -27,8 +27,8 @@ def create_lists_of_xs_ys_domain_cpu(domain):
 def calculate_distance_sum_from_center_cpu(domain, center_of_mass_0, center_of_mass_1):
     output = np.zeros(len(domain))
     for i in prange(len(domain)):
-        output[i] = (center_of_mass_0 - domain[i][0]) ** 2 + (
-                center_of_mass_1 - domain[i][1]) ** 2
+        output[i] = math.pow((center_of_mass_0 - domain[i][0]), 2) + math.pow((
+                center_of_mass_1 - domain[i][1]), 2)
     return output
 
 
@@ -36,14 +36,13 @@ def calculate_distance_sum_from_center_cpu(domain, center_of_mass_0, center_of_m
 def calculate_distance_from_center_to_edge_cpu(edge, center_of_mass_0, center_of_mass_1):
     output = np.zeros(len(edge))
     for i in prange(len(edge)):
-        output[i] = (center_of_mass_0 - edge[i][0][0]) ** 2 + (
-                center_of_mass_1 - edge[i][0][1]) ** 2
+        output[i] = math.pow((center_of_mass_0 - edge[i][0][0]), 2) + math.pow((
+                center_of_mass_1 - edge[i][0][1]), 2)
     return output
 
 
 @njit(parallel=True)
 def get_sum_of_minimal_distance_from_each_point_to_edge_cpu(domain, edge):
-
     sum_of_minimal_distances = 0
     for i in prange(len(domain)):
         list_of_distances = np.zeros(len(edge))

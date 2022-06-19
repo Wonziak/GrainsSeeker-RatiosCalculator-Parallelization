@@ -189,7 +189,7 @@ def save_to_file(file_name, phase_grains_dict):
                 file.write(str(grain.distanceFromCenter) + "\n")
                 file.write(str(grain.distanceFromEdgeToCenter) + "\n")
                 file.write(str(grain.distanceFromEdgeToCenterSquared) + "\n")
-                file.write(str(grain.minDistanceFromEdgeSum) + "\n") # sprawdzić
+                file.write(str(grain.minDistanceFromEdgeSum) + "\n")
                 file.write(str(grain.minDistaceCenterEdge) + "\n")
                 file.write(str(grain.maxDistaceCenterEdge) + "\n")
                 file.write(str(grain.maxDistancePoints) + "\n")

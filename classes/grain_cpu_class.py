@@ -83,8 +83,8 @@ class GrainCPUClass(RatiosClass):
 
     def find_com(self, offsetX=0, offsetY=0):  # srodek ciezkosci
         list_of_xs, list_of_ys = create_lists_of_xs_ys_domain_cpu(np.array(self.domain))
-        meanX = list_of_xs.mean()
-        meanY = list_of_ys.mean()
+        meanX = int(list_of_xs.mean())
+        meanY = int(list_of_ys.mean())
 
         self.centerOfMass.append(meanX)
         self.centerOfMass.append(meanY)

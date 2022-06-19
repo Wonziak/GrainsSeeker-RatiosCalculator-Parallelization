@@ -99,7 +99,8 @@ class GrainClass(RatiosClass):
             self):  # suma odleglosci od srodka ciezkosci, jeden to kazda odleglosc podniesiona do kwadratu
         distanceSumPower = 0
         for p in self.domain:
-            distpower = (self.centerOfMass[0] - p[0]) ** 2 + (self.centerOfMass[1] - p[1]) ** 2
+            distpower = math.pow((self.centerOfMass[0] - p[0]), 2) + math.pow(
+                (self.centerOfMass[1] - p[1]), 2)
             distanceSumPower += distpower
         self.distanceFromCenterPowerSum = distanceSumPower
 
@@ -107,8 +108,8 @@ class GrainClass(RatiosClass):
         distanceSumPower = 0
         distanceSum = 0
         for p in self.edge:
-            distpower = (self.centerOfMass[0] - p[0][0]) ** 2 + (
-                    self.centerOfMass[1] - p[0][1]) ** 2
+            distpower = math.pow((self.centerOfMass[0] - p[0][0]), 2) + math.pow((
+                    self.centerOfMass[1] - p[0][1]), 2)
             dist = math.sqrt(distpower)
             distanceSumPower += distpower
             distanceSum += dist
@@ -121,7 +122,8 @@ class GrainClass(RatiosClass):
             for edgePoint in self.edge:
                 if areaPoint[0] == edgePoint[0][0] and areaPoint[1] == edgePoint[0][1]:
                     continue
-                x = (edgePoint[0][0] - areaPoint[0]) ** 2 + (edgePoint[0][1] - areaPoint[1]) ** 2
+                x = math.pow((edgePoint[0][0] - areaPoint[0]), 2) + math.pow(
+                    (edgePoint[0][1] - areaPoint[1]), 2)
                 dist = math.sqrt(x)
                 if dist < mindist:
                     mindist = dist
@@ -133,8 +135,8 @@ class GrainClass(RatiosClass):
         maxdist = -1
         mindist = float('inf')
         for edgePoint in self.edge:
-            x = (self.centerOfMass[0] - edgePoint[0][0]) ** 2 + (
-                    self.centerOfMass[1] - edgePoint[0][1]) ** 2
+            x = math.pow((self.centerOfMass[0] - edgePoint[0][0]), 2) + math.pow((
+                    self.centerOfMass[1] - edgePoint[0][1]), 2)
             dist = math.sqrt(x)
             if dist > maxdist:
                 maxdist = dist
@@ -150,8 +152,8 @@ class GrainClass(RatiosClass):
             for edgePoint2 in self.edge:
                 if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
                     continue
-                x = (edgePoint2[0][0] - edgePoint1[0][0]) ** 2 + (
-                        edgePoint2[0][1] - edgePoint1[0][1]) ** 2
+                x = math.pow((edgePoint2[0][0] - edgePoint1[0][0]), 2) + math.pow((
+                        edgePoint2[0][1] - edgePoint1[0][1]), 2)
                 dist = math.sqrt(x)
                 if dist > maxdist:
                     coordinates[0] = edgePoint1[0][0]  # x1
@@ -172,8 +174,8 @@ class GrainClass(RatiosClass):
             for edgePoint2 in convex_hull:
                 if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
                     continue
-                x = (edgePoint2[0][0] - edgePoint1[0][0]) ** 2 + (
-                        edgePoint2[0][1] - edgePoint1[0][1]) ** 2
+                x = math.pow((edgePoint2[0][0] - edgePoint1[0][0]), 2) + math.pow((
+                        edgePoint2[0][1] - edgePoint1[0][1]), 2)
                 dist = math.sqrt(x)
                 if dist > maxdist:
                     coordinates[0] = edgePoint1[0][0]  # x1

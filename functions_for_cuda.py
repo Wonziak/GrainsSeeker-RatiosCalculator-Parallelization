@@ -8,8 +8,8 @@ def calculate_distance_sum_from_center_gpu(domain, output, center_of_mass_0, cen
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
     for i in range(start, len(domain), stride):
-        output[i] = (center_of_mass_0 - domain[i][0]) ** 2 + (
-                center_of_mass_1 - domain[i][1]) ** 2
+        output[i] = math.pow((center_of_mass_0 - domain[i][0]), 2) + math.pow((
+                center_of_mass_1 - domain[i][1]), 2)
 
 
 @cuda.jit
@@ -17,8 +17,8 @@ def calculate_distance_from_center_to_edge_gpu(edge, output, center_of_mass_0, c
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
     for i in range(start, len(edge), stride):
-        output[i] = (center_of_mass_0 - edge[i][0][0]) ** 2 + (
-                center_of_mass_1 - edge[i][0][1]) ** 2
+        output[i] = math.pow((center_of_mass_0 - edge[i][0][0]), 2) + math.pow((
+                center_of_mass_1 - edge[i][0][1]), 2)
 
 
 @cuda.jit

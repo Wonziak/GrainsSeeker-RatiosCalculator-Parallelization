@@ -96,8 +96,8 @@ class GrainGPUClass(RatiosClass):
         out_ys = cuda.device_array_like(empty_array)
         create_lists_of_xs_ys_domain_gpu[blocks_per_grid, threads_per_block](x_gpu, out_xs, out_ys)
         cuda.synchronize()
-        meanX = out_xs.copy_to_host().mean()
-        meanY = out_ys.copy_to_host().mean()
+        meanX = int(out_xs.copy_to_host().mean())
+        meanY = int(out_ys.copy_to_host().mean())
 
         self.centerOfMass.append(meanX)
         self.centerOfMass.append(meanY)
