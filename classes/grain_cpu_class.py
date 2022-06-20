@@ -120,8 +120,8 @@ class GrainCPUClass(RatiosClass):
             for edgePoint2 in convex_hull:
                 if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
                     continue
-                x = (edgePoint2[0][0] - edgePoint1[0][0]) ** 2 + (
-                        edgePoint2[0][1] - edgePoint1[0][1]) ** 2
+                x = math.pow((edgePoint2[0][0] - edgePoint1[0][0]), 2) + math.pow((
+                        edgePoint2[0][1] - edgePoint1[0][1]), 2)
                 dist = math.sqrt(x)
                 if dist > maxdist:
                     coordinates[0] = edgePoint1[0][0]  # x1

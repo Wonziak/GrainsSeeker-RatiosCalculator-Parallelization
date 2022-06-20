@@ -189,12 +189,16 @@ class GrainClass(RatiosClass):
     def __find_vector_perpendicular(self):
         dst = []
         for edgePoint1 in self.edge:
+            min_scalar = 9999999
+            vector_length = 0
             for edgePoint2 in self.edge:
                 if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
                     continue
                 vec = [edgePoint2[0][0] - edgePoint1[0][0], edgePoint2[0][1] - edgePoint1[0][1]]
-
-                if ((vec[0] * self.maxDistanceVectorCoords[0]) + (
-                        vec[1] * self.maxDistanceVectorCoords[1])) == 0:
-                    dst.append(math.sqrt(math.pow(vec[0], 2) + math.pow(vec[1], 2)))
+                scalar_product = (vec[0] * self.maxDistanceVectorCoords[0]) + (
+                        vec[1] * self.maxDistanceVectorCoords[1])
+                if abs(scalar_product) < min_scalar:
+                    min_scalar = abs(scalar_product)
+                    vector_length = (math.sqrt(math.pow(vec[0], 2) + math.pow(vec[1], 2)))
+            dst.append(vector_length)
         self.VectorPerpendicularLength = max(dst)

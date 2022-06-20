@@ -153,8 +153,8 @@ class GrainGPUClass(RatiosClass):
             for edgePoint2 in convex_hull:
                 if edgePoint1[0][0] == edgePoint2[0][0] and edgePoint1[0][1] == edgePoint2[0][1]:
                     continue
-                x = (edgePoint2[0][0] - edgePoint1[0][0]) ** 2 + (
-                        edgePoint2[0][1] - edgePoint1[0][1]) ** 2
+                x = math.pow((edgePoint2[0][0] - edgePoint1[0][0]), 2) + math.pow((
+                        edgePoint2[0][1] - edgePoint1[0][1]), 2)
                 dist = math.sqrt(x)
                 if dist > maxdist:
                     coordinates[0] = edgePoint1[0][0]  # x1
@@ -179,15 +179,24 @@ class GrainGPUClass(RatiosClass):
             self.minDistanceFromEdgeSum += min(distances)
 
     def __find_vector_perpendicular(self):
-        x_gpu = cuda.to_device(np.array(self.edge))
+        x_gpu = cuda.to_device(self.edge)
         threads_per_block = 96
         blocks_per_grid = 96
-        list_of_distances = []
         vector = cuda.to_device(np.zeros(2))
-        for edgePoint1 in self.edge:
-            distances = cuda.device_array_like(np.zeros(len(self.edge)))
-            get_all_perpendicular_vectors_length[blocks_per_grid, threads_per_block] \
-                (x_gpu, vector, distances, edgePoint1[0][0], edgePoint1[0][1],
-                 self.maxDistanceVectorCoords[0], self.maxDistanceVectorCoords[1])
-            list_of_distances.append(max(distances.copy_to_host()))
-        self.VectorPerpendicularLength = max(list_of_distances)
+        distances = np.zeros(len(self.edge))
+        distances_to_device = cuda.device_array_like(distances)
+
+        get_all_perpendicular_vectors_length[blocks_per_grid, threads_per_block] \
+            (x_gpu, vector, distances_to_device, self.maxDistanceVectorCoords[0],
+             self.maxDistanceVectorCoords[1])
+
+        distances = distances_to_device.copy_to_host()
+        self.VectorPerpendicularLength = max(distances)
+        # for i in range(len(self.edge)):
+        #
+        #     get_all_perpendicular_vectors_length[blocks_per_grid, threads_per_block] \
+        #         (x_gpu, vector, distances_to_device, self.edge[i][0][0], self.edge[i][0][1],
+        #          self.maxDistanceVectorCoords[0], self.maxDistanceVectorCoords[1])
+        #     list_of_distances.append(distances_to_device.copy_to_host())
+        # dst = [max(sublist) for sublist in list_of_distances]
+        # self.VectorPerpendicularLength = max(dst)
