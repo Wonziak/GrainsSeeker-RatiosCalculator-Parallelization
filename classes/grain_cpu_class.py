@@ -143,4 +143,5 @@ class GrainCPUClass(RatiosClass):
         self.VectorPerpendicularLength = \
             get_all_perpendicular_vectors_length_cpu(self.edge,
                                                      self.maxDistanceVectorCoords[0],
-                                                     self.maxDistanceVectorCoords[1])
+                                                     self.maxDistanceVectorCoords[1],
+                                                     self.maxDistancePoints)

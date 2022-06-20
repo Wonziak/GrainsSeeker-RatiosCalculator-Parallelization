@@ -188,15 +188,7 @@ class GrainGPUClass(RatiosClass):
 
         get_all_perpendicular_vectors_length[blocks_per_grid, threads_per_block] \
             (x_gpu, vector, distances_to_device, self.maxDistanceVectorCoords[0],
-             self.maxDistanceVectorCoords[1])
+             self.maxDistanceVectorCoords[1], self.maxDistancePoints)
 
         distances = distances_to_device.copy_to_host()
         self.VectorPerpendicularLength = max(distances)
-        # for i in range(len(self.edge)):
-        #
-        #     get_all_perpendicular_vectors_length[blocks_per_grid, threads_per_block] \
-        #         (x_gpu, vector, distances_to_device, self.edge[i][0][0], self.edge[i][0][1],
-        #          self.maxDistanceVectorCoords[0], self.maxDistanceVectorCoords[1])
-        #     list_of_distances.append(distances_to_device.copy_to_host())
-        # dst = [max(sublist) for sublist in list_of_distances]
-        # self.VectorPerpendicularLength = max(dst)
