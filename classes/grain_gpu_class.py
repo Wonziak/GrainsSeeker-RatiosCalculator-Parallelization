@@ -168,15 +168,27 @@ class GrainGPUClass(RatiosClass):
 
     def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
         x_gpu = cuda.to_device(np.array(self.edge))
+        y_gpu = cuda.to_device(np.array(self.domain))
         threads_per_block = 96
         blocks_per_grid = 96
-        for areaPoint in self.domain:
-            out_gpu = cuda.device_array_like(np.zeros(len(self.edge)))
-            get_sum_of_minimal_distance_from_each_point_to_edge[blocks_per_grid, threads_per_block] \
-                (x_gpu, out_gpu, areaPoint[0], areaPoint[1])
-            cuda.synchronize()
-            distances = out_gpu.copy_to_host()
+        out_gpu = cuda.device_array_like(np.zeros((len(self.domain), len(self.edge))))
+        get_sum_of_minimal_distance_from_each_point_to_edge[blocks_per_grid, threads_per_block] \
+            (x_gpu, y_gpu, out_gpu)
+        all_distances = out_gpu.copy_to_host()
+        for distances in all_distances:
             self.minDistanceFromEdgeSum += min(distances)
+
+        # OLD VERSION - WILL BE USED TO CALCULATE TIME OF SENDING TO DEVICE
+        # x_gpu = cuda.to_device(np.array(self.edge))
+        # threads_per_block = 96
+        # blocks_per_grid = 96
+        # for areaPoint in self.domain:
+        #     out_gpu = cuda.device_array_like(np.zeros(len(self.edge)))
+        #     get_sum_of_minimal_distance_from_each_point_to_edge[blocks_per_grid, threads_per_block] \
+        #         (x_gpu, out_gpu, areaPoint[0], areaPoint[1])
+        #     cuda.synchronize()
+        #     distances = out_gpu.copy_to_host()
+        #     self.minDistanceFromEdgeSum += min(distances)
 
     def __find_vector_perpendicular(self):
         x_gpu = cuda.to_device(self.edge)

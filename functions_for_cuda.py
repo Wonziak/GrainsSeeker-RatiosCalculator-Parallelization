@@ -41,15 +41,13 @@ def create_lists_of_xs_ys_domain_gpu(domain, xs, ys):
 
 
 @cuda.jit
-def get_sum_of_minimal_distance_from_each_point_to_edge(edge, distances, x, y):
+def get_sum_of_minimal_distance_from_each_point_to_edge(edge, domain, all_distances):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
-    for i in range(start, len(edge), stride):
-        if edge[i][0][0] == x and edge[i][0][1] == y:
-            continue
-        distances[i] = math.sqrt(
-            math.pow(edge[i][0][0] - x, 2) + math.pow(edge[i][0][1] - y, 2))
-
+    for i in range(start, len(domain), stride):
+        for j in range(len(edge)):
+            all_distances[i][j] = math.sqrt(
+                math.pow(edge[j][0][0] - domain[i][0], 2) + math.pow(edge[j][0][1] - domain[i][1], 2))
 
 @cuda.jit
 def get_all_perpendicular_vectors_length(edge, vector, distances, max_distance_vector_x,
@@ -68,20 +66,19 @@ def get_all_perpendicular_vectors_length(edge, vector, distances, max_distance_v
 
             numerator = ((vector[0] * max_distance_vector_x) + (vector[1] * max_distance_vector_y))
             denominator = vector_length * max_vector_length
-            cosa = abs(numerator/denominator)
+            cosa = abs(numerator / denominator)
             if cosa < min_cosine:
                 min_cosine = cosa
                 length = vector_length
         distances[i] = length
 
-            # for i in range(start, len(edge), stride):
-            #     if edge[i][0][0] == x and edge[i][0][1] == y:
-            #         continue
-            #     vector[0] = int(x - edge[i][0][0])
-            #     vector[1] = int(y - edge[i][0][1])
-            #     scalar_product = abs((vector[0] * max_distance_vector_x) + (
-            #             vector[1] * max_distance_vector_y))
-            #     if scalar_product < min_scalar:
-            #         min_scalar = scalar_product
-            #         vector_length = math.sqrt(math.pow(vector[0], 2) + math.pow(vector[1], 2))
-            #     distances[i] = vector_length
+# OLD VERSION
+# @cuda.jit
+# def get_sum_of_minimal_distance_from_each_point_to_edge(edge, distances, x, y):
+#     start = cuda.grid(1)
+#     stride = cuda.gridsize(1)
+#     for i in range(start, len(edge), stride):
+#         if edge[i][0][0] == x and edge[i][0][1] == y:
+#             continue
+#         distances[i] = math.sqrt(
+#             math.pow(edge[i][0][0] - x, 2) + math.pow(edge[i][0][1] - y, 2))
