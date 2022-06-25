@@ -1,6 +1,5 @@
 import math
 import config.ratios_config as rc
-import numpy as np
 
 
 class RatiosClass:
@@ -28,12 +27,12 @@ class RatiosClass:
         self.Blair_Bliss = self.area / math.sqrt(2 * math.pi * self.distanceFromCenterPowerSum)
 
     def __danielsson(self):
-        self.Danielsson = (self.area ** 3) / self.minDistanceFromEgdeSum
+        self.Danielsson = (math.pow(self.area, 3)) / self.minDistanceFromEdgeSum
 
     def __haralick(self):
         self.Haralick = math.sqrt(
-            (self.distanceFromEdgeToCenter ** 2) / (
-                    abs(self.area * self.distanceFromEdgeToCenterSquared - 1)))
+            (math.pow(self.distanceFromEdgeToCenter, 2)) / (
+                abs(self.area * self.distanceFromEdgeToCenterSquared - 1)))
 
     def __mz(self):
         self.Mz = (2 * math.sqrt(math.pi * self.area)) / self.perimeter
@@ -51,7 +50,7 @@ class RatiosClass:
         self.RC2 = self.perimeter / math.pi
 
     def __rcom(self):
-        self.RCom = self.perimeter ** 2 / self.area
+        self.RCom = math.pow(self.perimeter, 2) / self.area
 
     def __lp1(self):
         self.Lp1 = self.minDistaceCenterEdge / self.maxDistaceCenterEdge
@@ -62,60 +61,9 @@ class RatiosClass:
     def __lp3(self):
         self.Lp3 = self.maxDistancePoints / self.VectorPerpendicularLength
 
-    def __meanCurvature(self):
-        edge = []
-        for i in range(len(self.edge)):
-            edge.append(Point(self.edge[i][0][0], self.edge[i][0][1]))
-        edge.insert(0, edge[len(edge) - 1])
-        edge.append(edge[1])
-        i = 1
-        while i < len(edge) - 1:
-            x1 = edge[i - 1].x
-            x2 = edge[i].x
-            x3 = edge[i + 1].x
-            if (x1 == x2 and x2 != x3) or (x2 == x3 and x1 != x2):
-                del edge[i]
-                i = i - 1
-                continue
-            i += 1
-        del edge[0]
-        del edge[len(edge) - 1]
-
-        curvature = []
-        ptCount = 5
-        ptCount2 = int(ptCount / 2)
-        ypts = np.zeros(ptCount, np.uint8)
-        xpts = np.zeros(ptCount, np.uint8)
-
-        for i in range(len(edge)):
-            k = 0
-            for j in range(i - ptCount2, i + ptCount2 + 1):
-                xpts[k] = edge[j % len(edge)].x
-                ypts[k] = edge[j % len(edge)].y
-                k += 1
-            sortedX = np.sort(xpts)
-            if sortedX[0] == sortedX[len(sortedX) - 1]:
-                for j in range(ptCount):
-                    ypts[j] = xpts[j] * math.sin(math.pi / 2) + ypts[j] * math.cos(math.pi / 2)
-            first = self.__calculateDerviative(ypts)
-            second = self.__calculateDerviative(ypts, derivative=2)
-            if first == 0:
-                continue
-            c = abs(second / math.pow(1 + first * first, 3.0 / 2.0))
-            curvature.append(c)
-        mean = np.mean(curvature)
-        self.MeanCurvature = mean
-
-    def __calculateDerviative(self, ys, derivative=1):
-        if derivative == 1:
-            result = (-ys[4] + 8 * ys[3] - 8 * ys[1] + ys[0]) / 12 + (1 / 30) * ys[2]
-            return result
-        if derivative == 2:
-            result = ys[3] - 2 * ys[2] + ys[1]
-            return result
-
     def calculateRatios(self):
         rc.to_lower_case()
+        self.calculatedRatiosDict["Phase"] = self.phase
         if 'malinowska' in rc.ratiosToCalculateList:
             self.__malinowska()
             self.calculatedRatiosDict['malinowska'] = self.Malinowska
@@ -155,12 +103,3 @@ class RatiosClass:
         if 'lp3' in rc.ratiosToCalculateList:
             self.__lp3()
             self.calculatedRatiosDict['lp3'] = self.Lp3
-        if 'curvature' in rc.ratiosToCalculateList:
-            self.__meanCurvature()
-            self.calculatedRatiosDict['mean_curvature'] = self.MeanCurvature
-
-
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y

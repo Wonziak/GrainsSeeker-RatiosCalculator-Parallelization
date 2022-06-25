@@ -10,8 +10,7 @@ ratiosToCalculateList = ['Malinowska',
                          'RCOM',
                          'LP1',
                          'LP2',
-                         'LP3',
-                         'curvature']
+                         'LP3']
 
 
 def to_lower_case():

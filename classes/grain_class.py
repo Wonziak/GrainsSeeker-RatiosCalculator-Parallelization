@@ -35,7 +35,7 @@ class GrainClass(RatiosClass):
     def start_calculating(self):
         self.find_com()
         self.__calculate_com_distances_height_width()
-        # self.calculateRatios()
+        self.calculateRatios()
 
     def __calculate_com_distances_height_width(self):
         self.__calculate_distances_sum_from_center()

@@ -7,6 +7,7 @@ from grain_instances_generator import generate_grains_instances_sequentially, \
     generate_grains_instances_threading_with_gpu, \
     generate_grains_instances_sequentially_with_parallel_calculations_cpu, \
     generate_grains_instances_threading_with_numba_cpu
+from data_gatherer import create_series_from_ratios, save_results_to_excel_file
 
 if __name__ == '__main__':
     devices_info()
@@ -27,13 +28,15 @@ if __name__ == '__main__':
     contours = find_contours(phase_layers)
     find_contours_threading(phase_layers)
 
-    generate_grains_instances_sequentially_gpu(contours)
-    generate_grains_instances_threading(contours)
-    generate_grains_instances_sequentially(contours)
-    generate_grains_instances_threading_with_gpu(contours)
-    generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
-    generate_grains_instances_threading_with_numba_cpu(contours)
-    # generate_grain_instances_threads_per_grain(contours)
+    phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
+    # phase_grains_dict = generate_grains_instances_threading(contours)
+    # phase_grains_dict = generate_grains_instances_sequentially(contours)
+    # phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
+    # phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
+    # phase_grains_dict = generate_grains_instances_threading_with_numba_cpu(contours)
+    # phase_grains_dict = generate_grain_instances_threads_per_grain(contours)
+    _ = create_series_from_ratios(phase_grains_dict)
+    save_results_to_excel_file(phase_grains_dict, "seq_gpu.xlsx")
     colors = {
         'ferrite': (0, 255, 0),
         'bainite': (0, 0, 255),
