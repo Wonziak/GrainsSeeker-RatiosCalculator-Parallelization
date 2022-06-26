@@ -1,8 +1,9 @@
 from config.image_config import ImageConfig as ic
+from functions_for_cuda import color_black_borders_as_color_on_left, \
+    iterate_on_image_and_assign_number, sum_neighbours_right, sum_neighbours_under
 import itertools
 from numba import cuda
 import math
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
@@ -67,54 +68,10 @@ class StatisticsGPU:
             if value in under_borders.keys():
                 all_border_pixels += under_borders[value]
                 border_pixels[key] += under_borders[value]
-
         self.borderNeighboursCountRatio = {k: v / all_border_pixels for k, v in
                                            border_pixels.items()}
-
+        print(border_pixels)
         print("Border length ratio on GPU time is: " + str(time.time() - start_time))
-
-
-@cuda.jit
-def color_black_borders_as_color_on_left(image, image_no_borders):
-    j, i = cuda.grid(2)
-    m, n = image.shape[:2]
-    if 0 <= i < n and 0 <= j < m:
-        if image[j, i, 0] == 0 and image[j, i, 1] == 0 and image[j, i, 2] == 0:
-            image_no_borders[j, i, 0] = image[j - 1, i - 1, 0]
-            image_no_borders[j, i, 1] = image[j - 1, i - 1, 1]
-            image_no_borders[j, i, 2] = image[j - 1, i - 1, 2]
-        else:
-            image_no_borders[j, i, 0] = image[j, i, 0]
-            image_no_borders[j, i, 1] = image[j, i, 1]
-            image_no_borders[j, i, 2] = image[j, i, 2]
-
-
-@cuda.jit
-def iterate_on_image_and_assign_number(image, layer_of_numbers, color, number):
-    j, i = cuda.grid(2)
-    m, n = image.shape[:2]
-
-    if 0 <= i < n and 0 <= j < m:
-        if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
-            layer_of_numbers[j, i] = number
-
-
-@cuda.jit
-def sum_neighbours_right(layer_of_numbers, layer_of_numbers_sum):
-    j, i = cuda.grid(2)
-    m, n = layer_of_numbers.shape[:2]
-
-    if 0 <= i < n and 0 <= j < m - 1:
-        layer_of_numbers_sum[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j + 1, i]
-
-
-@cuda.jit
-def sum_neighbours_under(layer_of_numbers, layer_of_numbers_sum_under):
-    j, i = cuda.grid(2)
-    m, n = layer_of_numbers.shape[:2]
-
-    if 0 <= i < n and 0 <= j < m:
-        layer_of_numbers_sum_under[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j, i + 1]
 
 
 def remove_borders(image_no_borders, iterations):
@@ -151,17 +108,21 @@ def map_pixels_to_colors(image_no_borders):
 def sum_neighbours(numbers):
     x_gpu = cuda.to_device(numbers)
     out_gpu = cuda.device_array_like(numbers)
-    sum_neighbours_right[blockspergrid, threadsperblock](x_gpu, out_gpu)
-    cuda.synchronize()
-    summed_right = out_gpu.copy_to_host()
-
-    x_gpu = cuda.to_device(numbers)
-    out_gpu = cuda.device_array_like(numbers)
     sum_neighbours_under[blockspergrid, threadsperblock](x_gpu, out_gpu)
     cuda.synchronize()
     summed_under = out_gpu.copy_to_host()
 
+    summed_right = right(numbers)
     return summed_right, summed_under
+
+
+def right(numbers):
+    x_gpu = cuda.to_device(numbers)
+    out_gpu = cuda.device_array_like(numbers)
+    sum_neighbours_right[blockspergrid, threadsperblock](x_gpu, out_gpu)
+    cuda.synchronize()
+    summed_right = out_gpu.copy_to_host()
+    return summed_right
 
 
 def set_block():

@@ -82,3 +82,46 @@ def get_all_perpendicular_vectors_length(edge, vector, distances, max_distance_v
 #             continue
 #         distances[i] = math.sqrt(
 #             math.pow(edge[i][0][0] - x, 2) + math.pow(edge[i][0][1] - y, 2))
+
+
+@cuda.jit
+def color_black_borders_as_color_on_left(image, image_no_borders):
+    j, i = cuda.grid(2)
+    m, n = image.shape[:2]
+    if 0 <= i < n and 0 <= j < m:
+        if image[j, i, 0] == 0 and image[j, i, 1] == 0 and image[j, i, 2] == 0:
+            image_no_borders[j, i, 0] = image[j - 1, i - 1, 0]
+            image_no_borders[j, i, 1] = image[j - 1, i - 1, 1]
+            image_no_borders[j, i, 2] = image[j - 1, i - 1, 2]
+        else:
+            image_no_borders[j, i, 0] = image[j, i, 0]
+            image_no_borders[j, i, 1] = image[j, i, 1]
+            image_no_borders[j, i, 2] = image[j, i, 2]
+
+
+@cuda.jit
+def iterate_on_image_and_assign_number(image, layer_of_numbers, color, number):
+    j, i = cuda.grid(2)
+    m, n = image.shape[:2]
+
+    if 0 <= i < n and 0 <= j < m:
+        if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
+            layer_of_numbers[j, i] = number
+
+
+@cuda.jit
+def sum_neighbours_right(layer_of_numbers, layer_of_numbers_sum):
+    j, i = cuda.grid(2)
+    m, n = layer_of_numbers.shape[:2]
+
+    if 0 <= i < n and 0 <= j < m - 1:
+        layer_of_numbers_sum[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j + 1, i]
+
+
+@cuda.jit
+def sum_neighbours_under(layer_of_numbers, layer_of_numbers_sum_under):
+    j, i = cuda.grid(2)
+    m, n = layer_of_numbers.shape[:2]
+
+    if 0 <= i < n and 0 <= j < m:
+        layer_of_numbers_sum_under[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j, i + 1]

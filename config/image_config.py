@@ -11,7 +11,7 @@ class ImageConfig:
     heightOffset = 0
     widthOffset = 0
     background = []
-    numbers = [1, 3, 5, 11, 19, 21, 23, 27]
+    numbers = [1, 3, 8, 14, 19, 21, 23, 27]
     color_number = {}
 
     @staticmethod

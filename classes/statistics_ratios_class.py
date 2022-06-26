@@ -1,9 +1,9 @@
 from config.image_config import ImageConfig as ic
 import itertools
-import grain_class as gc
 import numpy as np
 import matplotlib.pyplot as plt
-
+import time
+from collections import defaultdict
 
 statsRatiosToCalculateList = ['BorderNeighbour',
                               'Dispersion',
@@ -22,148 +22,96 @@ class Statistics:
         self.grains = grains
         self.scale = scale
 
-    def __blr(self):
+    def blr(self):
+        start_time = time.time()
         colors = list(ic.colors_map.keys())
-        colorsDict = {v: k for k, v in ic.colors_map.items()}
 
         for pair in itertools.combinations(colors, 2):
-            combination = pair[0] + pair[1]
-            self.borderNeighboursCountRatio[combination] = 0
+            combination = pair[0] + "_" + pair[1]
+            self.borderNeighboursCountRatio[combination] = ic.color_number[pair[0]] + \
+                                                           ic.color_number[pair[1]]
 
-        for i in range(ic.height):
-            for j in range(ic.width - 1):
+        image_no_borders = ic.image
+        image_no_borders = remove_borders(image_no_borders, 14)
 
-                color = [ic.image[i, j, 2], ic.image[i, j, 1], ic.image[i, j, 0]]
-                nbcolorright = [ic.image[i, j + 1, 2], ic.image[i, j + 1, 1], ic.image[i, j + 1, 0]]
+        numbers = map_pixels_to_colors(image_no_borders)
 
-                if tuple(color) in colorsDict.keys() and tuple(nbcolorright) in colorsDict.keys():
-                    phasename = colorsDict[tuple(color)]
-                    nbrightphasename = colorsDict[tuple(nbcolorright)]
-                    if phasename + nbrightphasename in self.borderNeighboursCountRatio.keys():
-                        self.borderNeighboursCountRatio[phasename + nbrightphasename] += 1
-                    if nbrightphasename + phasename in self.borderNeighboursCountRatio.keys():
-                        self.borderNeighboursCountRatio[nbrightphasename + phasename] += 1
+        layer_of_numbers_sum_under = np.zeros((ic.image.shape[0], ic.image.shape[1]))
+        layer_of_numbers_sum_right = np.zeros((ic.image.shape[0], ic.image.shape[1]))
+        summed_right, summed_under = sum_neighbours(numbers, layer_of_numbers_sum_under,
+                                                    layer_of_numbers_sum_right)
+        right_uniques, right_occurrences = np.unique(summed_right, return_counts=True)
+        under_uniques, under_occurrences = np.unique(summed_under, return_counts=True)
 
-        for i in range(ic.height - 1):
-            for j in range(ic.width):
-                color = [ic.image[i, j, 2], ic.image[i, j, 1], ic.image[i, j, 0]]
-                nbcolorunder = [ic.image[i + 1, j, 2], ic.image[i + 1, j, 1], ic.image[i + 1, j, 0]]
-                if tuple(color) in colorsDict.keys() and tuple(nbcolorunder) in colorsDict.keys():
-                    phasename = colorsDict[tuple(color)]
-                    nbcolorunderphasename = colorsDict[tuple(nbcolorunder)]
-                    if phasename + nbcolorunderphasename in self.borderNeighboursCountRatio.keys():
-                        self.borderNeighboursCountRatio[phasename + nbcolorunderphasename] += 1
-                    if nbcolorunderphasename + phasename in self.borderNeighboursCountRatio.keys():
-                        self.borderNeighboursCountRatio[nbcolorunderphasename + phasename] += 1
-        allborderpixels = sum(list(self.borderNeighboursCountRatio.values()))
-        if allborderpixels != 0:
-            for key, value in self.borderNeighboursCountRatio.items():
-                self.borderNeighboursCountRatio[key] = value / allborderpixels
+        right_borders = {}
+        under_borders = {}
 
-    def __dispersion(self):
-        area = self.imageArea * (self.scale ** 2)
-        for phases in ic.colors_map.keys():
-            self.dispersionPhases[phases] = 0
-        for gc.Grain in self.grains:
-            self.dispersionPhases[gc.Grain.phase] += 1
-        for key, value in self.dispersionPhases.items():
-            self.dispersionPhases[key] = (value / area) * 100
+        for i in range(len(right_uniques)):
+            right_borders[int(right_uniques[i])] = right_occurrences[i]
 
-    def __onePointProb(self):
-        colorsDict = {v: k for k, v in ic.colors_map.items()}
-        for phase in ic.colors_map.keys():
-            self.onePointProbability[phase] = 0
-        for i in range(ic.height):
-            for j in range(ic.width):
-                color = (ic.image[i, j, 2], ic.image[i, j, 1], ic.image[i, j, 0])
-                if color in colorsDict.keys():
-                    phasename = colorsDict[color]
-                    self.onePointProbability[phasename] += 1
-        for key, value in self.onePointProbability.items():
-            self.onePointProbability[key] = value / self.imageArea
+        for i in range(len(under_uniques)):
+            under_borders[int(under_uniques[i])] = under_occurrences[i]
 
-    def __linealpath(self):
-        for phase in ic.colors_map.keys():
-            self.linealPath[phase] = {'angleZero': np.zeros((ic.width,), dtype=float),
-                                      'angle90': np.zeros((ic.height,), dtype=float),
-                                      'angle45': np.zeros((ic.height,), dtype=float)}
-        colorsDict = {v: k for k, v in ic.colors_map.items()}
-        rng = np.random.default_rng()
-        xCoordinates = rng.choice(ic.width, 50)
-        yCoordinates = rng.choice(ic.height, 50)
-        for point in range(50):
-            x = xCoordinates[point]
-            y = yCoordinates[point]
-            xyColor = (ic.image[y, x, 2], ic.image[y, x, 1], ic.image[y, x, 0])
-            for pointAngleZero in range(ic.width - 1):
-                pointAngleZero = pointAngleZero + 1
-                pointToCheck = x + pointAngleZero
-                if pointToCheck >= ic.width:
-                    pointToCheck = pointToCheck - ic.width
-                pointToCheckColor = (ic.image[y, pointToCheck, 2], ic.image[y, pointToCheck, 1],
-                                     ic.image[y, pointToCheck, 0])
-                if xyColor[0] == pointToCheckColor[0] and xyColor[1] == pointToCheckColor[1] and xyColor[2] == pointToCheckColor[2]:
-                    self.linealPath[colorsDict[xyColor]]['angleZero'][pointAngleZero] += 0.02
-                else:
-                    break
-            for pointAngle90 in range(ic.height - 1):
-                pointAngle90 = pointAngle90 + 1
-                pointToCheck = y + pointAngle90
-                if pointToCheck >= ic.height:
-                    pointToCheck = pointToCheck - ic.height
-                pointToCheckColor = (ic.image[pointToCheck, x, 2], ic.image[pointToCheck, x, 1],
-                                     ic.image[pointToCheck, x, 0])
-                if xyColor[0] == pointToCheckColor[0] and xyColor[1] == pointToCheckColor[1] and xyColor[2] == \
-                        pointToCheckColor[2]:
-                    self.linealPath[colorsDict[xyColor]]['angle90'][pointAngle90] += 0.02
-                else:
-                    break
-            for pointAngle45 in range(ic.height - 1):
-                pointAngle45 = pointAngle45 + 1
-                pointToCheckY = y - pointAngle45
-                pointToCheckX = x + pointAngle45
-                if pointToCheckX >= ic.width:
-                    pointToCheckX = pointToCheckX - ic.width
-                if pointToCheckY < 0:
-                    pointToCheckY = pointToCheckY + ic.height - 1
-                pointToCheckColor = (
-                    ic.image[pointToCheckY, pointToCheckX, 2], ic.image[pointToCheckY, pointToCheckX, 1],
-                    ic.image[pointToCheckY, pointToCheckX, 0])
-                if xyColor[0] == pointToCheckColor[0] and xyColor[1] == pointToCheckColor[1] and xyColor[2] == \
-                        pointToCheckColor[2]:
-                    self.linealPath[colorsDict[xyColor]]['angle45'][pointAngle45] += 0.02
-                else:
-                    break
-        for phase in ic.colors_map.keys():
-            self.linealPath[phase]['angleZero'] = np.delete(self.linealPath[phase]['angleZero'], 0)
-            self.linealPath[phase]['angle45'] = np.delete(self.linealPath[phase]['angle45'], 0)
-            self.linealPath[phase]['angle90'] = np.delete(self.linealPath[phase]['angle90'], 0)
+        all_border_pixels = 0
+        border_pixels = defaultdict(int)
+        for key, value in self.borderNeighboursCountRatio.items():
+            if value in right_borders.keys():
+                all_border_pixels += right_borders[value]
+                border_pixels[key] += right_borders[value]
+            if value in under_borders.keys():
+                all_border_pixels += under_borders[value]
+                border_pixels[key] += under_borders[value]
+        print(border_pixels)
+        self.borderNeighboursCountRatio = {k: v / all_border_pixels for k, v in
+                                           border_pixels.items()}
 
-        angles = ['angleZero', 'angle45', 'angle90']
-        x = range(1, ic.width)
-        y = range(1, ic.height)
-        for phase in ic.colors_map.keys():
-            for angle in angles:
-                if angle == 'angleZero':
-                    plt.plot(x, self.linealPath[phase]['angleZero'])
-                else:
-                    plt.plot(y, self.linealPath[phase][angle])
-                plt.xlabel('distance')
-                plt.ylabel('probability')
-                plt.title(phase + " " + angle)
-                plt.show()
+        print("Border length ratio sequentially time is: " + str(time.time() - start_time))
 
-    def calculateRatios(self):
-        if 'BorderNeighbour' in statsRatiosToCalculateList:
-            self.__blr()
-            self.calculatedRatios['BorderNeighbour'] = self.borderNeighboursCountRatio
-        if 'Dispersion' in statsRatiosToCalculateList:
-            self.__dispersion()
-            self.calculatedRatios['Dispersion'] = self.dispersionPhases
-        if 'OnePointProbability' in statsRatiosToCalculateList:
-            self.__onePointProb()
-            self.calculatedRatios['OnePointProbability'] = self.onePointProbability
-        if 'Linealpath' in statsRatiosToCalculateList:
-            self.__linealpath()
-            # self.calculatedRatios['Lineal-path'] = self.linealPath
-        return self.calculatedRatios
+
+def remove_borders(image_no_borders, iterations):
+    for i in range(iterations):
+        image_no_borders = color_black_borders_as_color_on_left(ic.image, image_no_borders)
+    return image_no_borders
+
+
+def color_black_borders_as_color_on_left(image, image_no_borders):
+    for i in range(ic.width):
+        for j in range(ic.height):
+            if image[j, i, 0] == 0 and image[j, i, 1] == 0 and image[j, i, 2] == 0:
+                image_no_borders[j, i, 0] = image[j - 1, i - 1, 0]
+                image_no_borders[j, i, 1] = image[j - 1, i - 1, 1]
+                image_no_borders[j, i, 2] = image[j - 1, i - 1, 2]
+            else:
+                image_no_borders[j, i, 0] = image[j, i, 0]
+                image_no_borders[j, i, 1] = image[j, i, 1]
+                image_no_borders[j, i, 2] = image[j, i, 2]
+    return image_no_borders
+
+
+def map_pixels_to_colors(image_no_borders):
+    colors_as_numbers = np.zeros((ic.image.shape[0], ic.image.shape[1]))
+    for phase in ic.colors_map.keys():
+        if phase in ic.background:
+            continue
+        color = ic.colors_map[phase]
+        number = ic.color_number[phase]
+        assign_color_number(image_no_borders, colors_as_numbers, color, number)
+    return colors_as_numbers
+
+
+def assign_color_number(image, colors_as_numbers, color, number):
+    for i in range(ic.width):
+        for j in range(ic.height):
+            if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == \
+                    color[0]:
+                colors_as_numbers[j, i] = number
+
+
+def sum_neighbours(layer_of_numbers, layer_of_numbers_sum_under, layer_of_numbers_sum_right):
+    for i in range(ic.width - 1):
+        for j in range(ic.height):
+            layer_of_numbers_sum_under[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j, i + 1]
+    for i in range(ic.width):
+        for j in range(ic.height - 1):
+            layer_of_numbers_sum_right[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j + 1, i]
+    return layer_of_numbers_sum_right, layer_of_numbers_sum_under

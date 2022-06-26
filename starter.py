@@ -9,10 +9,11 @@ from grain_instances_generator import generate_grains_instances_sequentially, \
     generate_grains_instances_threading_with_numba_cpu
 from data_gatherer import create_series_from_ratios, save_results_to_excel_file
 from classes.statistics_ratios_gpu_class import StatisticsGPU
+from classes.statistics_ratios_class import Statistics
 
 if __name__ == '__main__':
     devices_info()
-    image_path = 'RealImages/DP800-9800x9500.png'
+    image_path = 'RealImages/DP800-500x200.png'
     # image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     # color_map = ImageConfig.colors_map = {
     #             'ferrite': (29, 143, 255),
@@ -43,7 +44,9 @@ if __name__ == '__main__':
         'bainite': (0, 0, 255),
         'martensite': (255, 0, 0),
     }
-    stats = StatisticsGPU(grains=[])
+    stats = Statistics(grains=[])
     stats.blr()
+    statsGPU = StatisticsGPU(grains=[])
+    statsGPU.blr()
     # x, y = Rc().calculate_ratios(image=image, background='bainite')
     # print(x, y)
