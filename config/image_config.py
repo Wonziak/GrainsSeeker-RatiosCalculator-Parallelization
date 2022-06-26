@@ -11,6 +11,8 @@ class ImageConfig:
     heightOffset = 0
     widthOffset = 0
     background = []
+    numbers = [1, 3, 5, 11, 19, 21, 23, 27]
+    color_number = {}
 
     @staticmethod
     def generate_image_info(image_path, colors_map=None, background=None):
@@ -31,3 +33,6 @@ class ImageConfig:
         ImageConfig.colorsNumber = len(ImageConfig.colors_map)
         ImageConfig.heightOffset = 0
         ImageConfig.widthOffset = 0
+        iterator_numbers = iter(ImageConfig.numbers)
+        for key in ImageConfig.colors_map.keys():
+            ImageConfig.color_number[key] = next(iterator_numbers)

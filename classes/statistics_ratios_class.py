@@ -1,8 +1,9 @@
-import ImageConfig as ic
+from config.image_config import ImageConfig as ic
 import itertools
 import grain_class as gc
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 statsRatiosToCalculateList = ['BorderNeighbour',
                               'Dispersion',
@@ -31,8 +32,10 @@ class Statistics:
 
         for i in range(ic.height):
             for j in range(ic.width - 1):
+
                 color = [ic.image[i, j, 2], ic.image[i, j, 1], ic.image[i, j, 0]]
                 nbcolorright = [ic.image[i, j + 1, 2], ic.image[i, j + 1, 1], ic.image[i, j + 1, 0]]
+
                 if tuple(color) in colorsDict.keys() and tuple(nbcolorright) in colorsDict.keys():
                     phasename = colorsDict[tuple(color)]
                     nbrightphasename = colorsDict[tuple(nbcolorright)]
