@@ -2,6 +2,7 @@ import cv2
 from numba import njit, prange
 import numpy as np
 import math
+from config.image_config import ImageConfig as ic
 
 
 @njit(parallel=True)
@@ -79,3 +80,38 @@ def get_all_perpendicular_vectors_length_cpu(edge, max_distance_vector_x,
         all_lengths[i] = length
 
     return np.amax(all_lengths)
+
+
+@njit(parallel=True)
+def color_black_borders_as_color_on_left_cpu(image, image_no_borders, width, height):
+    for i in prange(height):
+        for j in prange(width):
+            if image[j, i, 0] == 0 and image[j, i, 1] == 0 and image[j, i, 2] == 0:
+                image_no_borders[j, i, 0] = image[j - 1, i - 1, 0]
+                image_no_borders[j, i, 1] = image[j - 1, i - 1, 1]
+                image_no_borders[j, i, 2] = image[j - 1, i - 1, 2]
+            else:
+                image_no_borders[j, i, 0] = image[j, i, 0]
+                image_no_borders[j, i, 1] = image[j, i, 1]
+                image_no_borders[j, i, 2] = image[j, i, 2]
+    return image_no_borders
+
+
+@njit(parallel=True)
+def assign_color_number_cpu(image, colors_as_numbers, color, number):
+    for i in prange(image.shape[1]):
+        for j in prange(image.shape[0]):
+            if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == \
+                    color[0]:
+                colors_as_numbers[j, i] = number
+
+
+@njit(parallel=True)
+def sum_neighbours_cpu(layer_of_numbers, layer_of_numbers_sum_under, layer_of_numbers_sum_right):
+    for i in prange(layer_of_numbers.shape[1] - 1):
+        for j in prange(layer_of_numbers.shape[0]):
+            layer_of_numbers_sum_under[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j, i + 1]
+    for i in prange(layer_of_numbers.shape[1]):
+        for j in prange(layer_of_numbers.shape[0] - 1):
+            layer_of_numbers_sum_right[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j + 1, i]
+    return layer_of_numbers_sum_right, layer_of_numbers_sum_under
