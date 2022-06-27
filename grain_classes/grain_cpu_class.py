@@ -3,9 +3,9 @@ import math
 import cv2
 import numpy as np
 
-from classes.ratios_class import RatiosClass
+from grain_classes.ratios_class import RatiosClass
 from config.image_config import ImageConfig
-from functions_for_cpu import create_lists_of_xs_ys_edge_cpu, create_lists_of_xs_ys_domain_cpu, \
+from devices_functions.functions_for_cpu import create_lists_of_xs_ys_edge_cpu, create_lists_of_xs_ys_domain_cpu, \
     calculate_distance_sum_from_center_cpu, calculate_distance_from_center_to_edge_cpu, \
     get_sum_of_minimal_distance_from_each_point_to_edge_cpu, \
     get_all_perpendicular_vectors_length_cpu

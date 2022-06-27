@@ -1,6 +1,6 @@
-from classes.grain_class import GrainClass
-from classes.grain_gpu_class import GrainGPUClass
-from classes.grain_cpu_class import GrainCPUClass
+from grain_classes.grain_class import GrainClass
+from grain_classes.grain_gpu_class import GrainGPUClass
+from grain_classes.grain_cpu_class import GrainCPUClass
 from collections import defaultdict
 import time
 from multiprocessing import Pool, Manager

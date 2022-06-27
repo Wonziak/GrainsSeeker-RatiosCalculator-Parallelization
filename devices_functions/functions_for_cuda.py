@@ -1,7 +1,15 @@
 import math
-
-import numpy as np
 from numba import cuda
+
+
+@cuda.jit
+def iterate_on_image_compare_color_cuda(image, color, layer):
+    j, i = cuda.grid(2)
+    m, n = image.shape[:2]
+
+    if 0 <= i < n and 0 <= j < m:
+        if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
+            layer[j, i, 0] = 255
 
 
 @cuda.jit
@@ -47,7 +55,9 @@ def get_sum_of_minimal_distance_from_each_point_to_edge(edge, domain, all_distan
     for i in range(start, len(domain), stride):
         for j in range(len(edge)):
             all_distances[i][j] = math.sqrt(
-                math.pow(edge[j][0][0] - domain[i][0], 2) + math.pow(edge[j][0][1] - domain[i][1], 2))
+                math.pow(edge[j][0][0] - domain[i][0], 2) + math.pow(edge[j][0][1] - domain[i][1],
+                                                                     2))
+
 
 @cuda.jit
 def get_all_perpendicular_vectors_length(edge, vector, distances, max_distance_vector_x,
@@ -71,6 +81,7 @@ def get_all_perpendicular_vectors_length(edge, vector, distances, max_distance_v
                 min_cosine = cosa
                 length = vector_length
         distances[i] = length
+
 
 # OLD VERSION
 # @cuda.jit
@@ -123,5 +134,5 @@ def sum_neighbours_under(layer_of_numbers, layer_of_numbers_sum_under):
     j, i = cuda.grid(2)
     m, n = layer_of_numbers.shape[:2]
 
-    if 0 <= i < n and 0 <= j < m:
+    if 0 <= i < n - 1 and 0 <= j < m:
         layer_of_numbers_sum_under[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j, i + 1]

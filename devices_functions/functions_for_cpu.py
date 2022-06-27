@@ -2,7 +2,15 @@ import cv2
 from numba import njit, prange
 import numpy as np
 import math
-from config.image_config import ImageConfig as ic
+
+
+@njit(parallel=True)
+def iterate_on_image_compare_color_cpu(image, width, height, layer, color):
+    for i in prange(width):
+        for j in prange(height):
+            if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == \
+                    color[0]:
+                layer[j, i, 0] = 255
 
 
 @njit(parallel=True)

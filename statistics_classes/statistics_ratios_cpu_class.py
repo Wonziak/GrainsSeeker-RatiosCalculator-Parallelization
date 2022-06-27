@@ -1,12 +1,11 @@
 from config.image_config import ImageConfig as ic
-from functions_for_cpu import color_black_borders_as_color_on_left_cpu, sum_neighbours_cpu, \
-    assign_color_number_cpu
+from devices_functions.functions_for_cpu import sum_neighbours_cpu
+from .functions.statistic_ratios_cpu_functions import *
 import itertools
 import numpy as np
-import matplotlib.pyplot as plt
 import time
 from collections import defaultdict
-import cv2
+import math
 
 statsRatiosToCalculateList = ['BorderNeighbour',
                               'Dispersion',
@@ -35,7 +34,7 @@ class StatisticsCPU:
                                                            ic.color_number[pair[1]]
 
         image_no_borders = ic.image
-        image_no_borders = remove_borders(image_no_borders, 20)
+        image_no_borders = remove_borders(image_no_borders, 14)
 
         numbers = map_pixels_to_colors(image_no_borders)
 
@@ -70,22 +69,8 @@ class StatisticsCPU:
 
         print("Border length ratio on CPU time is: " + str(time.time() - start_time))
 
-
-def remove_borders(image_no_borders, iterations):
-    for i in range(iterations):
-        image_no_borders = color_black_borders_as_color_on_left_cpu(ic.image,
-                                                                    image_no_borders,
-                                                                    ic.image.shape[0],
-                                                                    ic.image.shape[1])
-    return image_no_borders
-
-
-def map_pixels_to_colors(image_no_borders):
-    colors_as_numbers = np.zeros((ic.image.shape[0], ic.image.shape[1]))
-    for phase in ic.colors_map.keys():
-        if phase in ic.background:
-            continue
-        color = ic.colors_map[phase]
-        number = ic.color_number[phase]
-        assign_color_number_cpu(image_no_borders, colors_as_numbers, color, number)
-    return colors_as_numbers
+    def dispersion(self):
+        start_time = time.time()
+        area = self.imageArea * (math.pow(self.scale, 2))
+        self.dispersionPhases = {k: (len(v) / area) * 100 for k, v in self.grains.items()}
+        print("Dispersion time is: " + str(time.time() - start_time))

@@ -1,7 +1,7 @@
 from config.image_config import ImageConfig
 import cv2
 import math
-from classes.ratios_class import RatiosClass
+from grain_classes.ratios_class import RatiosClass
 import numpy as np
 from numba import njit, cuda
 

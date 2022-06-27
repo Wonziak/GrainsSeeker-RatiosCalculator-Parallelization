@@ -4,9 +4,9 @@ import cv2
 import numpy as np
 from numba import cuda
 
-from classes.ratios_class import RatiosClass
+from grain_classes.ratios_class import RatiosClass
 from config.image_config import ImageConfig
-from functions_for_cuda import calculate_distance_sum_from_center_gpu, \
+from devices_functions.functions_for_cuda import calculate_distance_sum_from_center_gpu, \
     calculate_distance_from_center_to_edge_gpu, create_lists_of_xs_ys_edge_gpu, \
     create_lists_of_xs_ys_domain_gpu, get_sum_of_minimal_distance_from_each_point_to_edge, \
     get_all_perpendicular_vectors_length

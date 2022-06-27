@@ -1,7 +1,9 @@
+from devices_functions.functions_for_cpu import iterate_on_image_compare_color_cpu
+from devices_functions.functions_for_cuda import iterate_on_image_compare_color_cuda
 import cv2
 import numpy as np
 from config.image_config import ImageConfig
-from numba import njit, cuda, prange
+from numba import njit, cuda
 import math
 import time
 
@@ -28,7 +30,8 @@ def __find_layers_sequentially(image, colors):
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
         for i in range(ImageConfig.width):
             for j in range(ImageConfig.height):
-                if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
+                if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == \
+                        color[0]:
                     layer[j, i, 0] = 255
         phase_layers[phase] = layer
     print("Sequentially time: " + str(time.time() - start_time))
@@ -44,28 +47,19 @@ def __find_layers_gpu(image, colors):
     blockspergrid_x = math.ceil(x_gpu.shape[0] / threadsperblock[0])
     blockspergrid_y = math.ceil(x_gpu.shape[1] / threadsperblock[1])
     blockspergrid = (blockspergrid_x, blockspergrid_y)
+
     start_time = time.time()
     for phase in colors.keys():
         if phase in ImageConfig.background:
             continue
         color = colors[phase]
         out_gpu = cuda.device_array_like(empty_array)
-        __iterate_on_image_compare_color_cuda[blockspergrid, threadsperblock](x_gpu, color, out_gpu)
+        iterate_on_image_compare_color_cuda[blockspergrid, threadsperblock](x_gpu, color, out_gpu)
         cuda.synchronize()
         layer = out_gpu.copy_to_host()
         phase_layers[phase] = layer
-    print("GPU parallel time: " + str(time.time()-start_time))
+    print("GPU parallel time: " + str(time.time() - start_time))
     return phase_layers
-
-
-@cuda.jit
-def __iterate_on_image_compare_color_cuda(image, color, layer):
-    j, i = cuda.grid(2)
-    m, n = image.shape[:2]
-
-    if 0 <= i < n and 0 <= j < m:
-        if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
-            layer[j, i, 0] = 255
 
 
 def __find_layers_cpu_parallel(image, colors):
@@ -76,18 +70,11 @@ def __find_layers_cpu_parallel(image, colors):
             continue
         color = colors[phase]
         layer = np.zeros((ImageConfig.height, ImageConfig.width, 1), np.uint8)
-        __iterate_on_image_compare_color_cpu(image, ImageConfig.width, ImageConfig.height, layer, color)
+        iterate_on_image_compare_color_cpu(image, ImageConfig.width, ImageConfig.height, layer,
+                                           color)
         phase_layers[phase] = layer
     print("CPU parallel time: " + str(time.time() - start_time))
     return phase_layers
-
-
-@njit(parallel=True)
-def __iterate_on_image_compare_color_cpu(image, width, height, layer, color):
-    for i in prange(width):
-        for j in prange(height):
-            if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
-                layer[j, i, 0] = 255
 
 
 def show_layers(phase_layers=dict):
