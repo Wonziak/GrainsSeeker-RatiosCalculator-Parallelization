@@ -74,3 +74,19 @@ class Statistics:
         area = self.imageArea * (math.pow(self.scale, 2))
         self.dispersionPhases = {k: (len(v) / area) * 100 for k, v in self.grains.items()}
         print("Dispersion time is: " + str(time.time() - start_time))
+
+    def one_point_prob(self):
+        start_time = time.time()
+        colors_dict = {v: k for k, v in ic.colors_map.items()}
+        for phase in ic.colors_map.keys():
+            self.onePointProbability[phase] = 0
+        for i in range(ic.height):
+            for j in range(ic.width):
+                color = (ic.image[i, j, 2], ic.image[i, j, 1], ic.image[i, j, 0])
+                if color in colors_dict.keys():
+                    phasename = colors_dict[color]
+                    self.onePointProbability[phasename] += 1
+        for key, value in self.onePointProbability.items():
+            self.onePointProbability[key] = value / self.imageArea
+        print("One point probability sequentially time is: " + str(time.time() - start_time))
+        print(self.onePointProbability)

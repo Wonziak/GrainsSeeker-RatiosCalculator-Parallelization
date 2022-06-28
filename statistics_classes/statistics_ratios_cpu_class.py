@@ -74,3 +74,18 @@ class StatisticsCPU:
         area = self.imageArea * (math.pow(self.scale, 2))
         self.dispersionPhases = {k: (len(v) / area) * 100 for k, v in self.grains.items()}
         print("Dispersion time is: " + str(time.time() - start_time))
+
+    def one_point_prob(self):
+        start_time = time.time()
+        numbers = map_pixels_to_colors(ic.image)
+        uniques, occurrences = np.unique(numbers, return_counts=True)
+
+        number_color_dict = {v: k for k, v in ic.color_number.items()}
+        for key, value in number_color_dict.items():
+            for unique in uniques:
+                if unique == key:
+                    index = np.where(uniques == unique)[0][0]
+                    self.onePointProbability[number_color_dict[unique]] = \
+                        occurrences[index] / self.imageArea
+        print("One point probability on CPU time is: " + str(time.time() - start_time))
+        print(self.onePointProbability)
