@@ -9,7 +9,7 @@ from grain_instances_generator import generate_grains_instances_sequentially_gpu
 
 if __name__ == '__main__':
     devices_info()
-    image_path = 'RealImages/DP800-9800x9500.png'
+    image_path = 'RealImages/DP800-200x200.png'
     # image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     # color_map = ImageConfig.colors_map = {
     #             'ferrite': (29, 143, 255),
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     phase_layers = generate_binary_images(method="CPU")
     # phase_layers = generate_binary_images(method="SEQ")
 
-    contours = find_contours(phase_layers)
+    # contours = find_contours(phase_layers)
     # find_contours_threading(phase_layers)
 
     # phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
@@ -40,13 +40,15 @@ if __name__ == '__main__':
         'bainite': (0, 0, 255),
         'martensite': (255, 0, 0),
     }
-    # stats = Statistics(grains=phase_grains_dict, scale=1)
+    stats = Statistics(grains=[], scale=1)
+    stats.lineal_path()
     # stats.one_point_prob()
     statsGPU = StatisticsGPU(grains=[])
-    statsGPU.one_point_prob()
+    statsGPU.lineal_path()
+    # statsGPU.one_point_prob()
     # statsGPU.blr()
-    statsCPU = StatisticsCPU(grains=[])
-    statsCPU.one_point_prob()
+    # statsCPU = StatisticsCPU(grains=[])
+    # statsCPU.one_point_prob()
     # statsCPU.blr()
     # x, y = Rc().calculate_ratios(image=image, background='bainite')
     # print(x, y)

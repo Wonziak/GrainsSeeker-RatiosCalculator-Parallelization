@@ -7,11 +7,6 @@ import numpy as np
 
 
 def remove_borders(image_no_borders, iterations):
-    threadsperblock = (16, 16)
-    blockspergrid_x = math.ceil(ic.image.shape[0] / threadsperblock[0])
-    blockspergrid_y = math.ceil(ic.image.shape[1] / threadsperblock[1])
-    blockspergrid = (blockspergrid_x, blockspergrid_y)
-
     for i in range(iterations):
         x_gpu = cuda.to_device(image_no_borders)
         out_gpu = cuda.device_array_like(image_no_borders)
