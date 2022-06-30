@@ -6,6 +6,8 @@ import numpy as np
 import time
 from collections import defaultdict
 import math
+from numba import njit, prange
+import matplotlib.pyplot as plt
 
 statsRatiosToCalculateList = ['BorderNeighbour',
                               'Dispersion',
@@ -89,3 +91,116 @@ class StatisticsCPU:
                         occurrences[index] / self.imageArea
         print("One point probability on CPU time is: " + str(time.time() - start_time))
         print(self.onePointProbability)
+
+    def lineal_path(self):
+        lineal_path = {}
+        for phase in ic.colors_map.keys():
+            lineal_path[phase] = {'angleZero': np.zeros((ic.width,), dtype=float),
+                                  'angle90': np.zeros((ic.height,), dtype=float),
+                                  'angle45': np.zeros((ic.height,), dtype=float)}
+
+        rng = np.random.default_rng()
+        x_coordinates = rng.choice(ic.width, 50)
+        y_coordinates = rng.choice(ic.height, 50)
+
+        x_coordinates = np.array(x_coordinates)
+        y_coordinates = np.array(y_coordinates)
+        numbers = map_pixels_to_colors(ic.image)
+        for phase, number in ic.color_number.items():
+            lineal_path[phase]['angleZero'] = angle_0(numbers, number, x_coordinates, y_coordinates, ic.width,
+                                                      lineal_path[phase]['angleZero'])
+            lineal_path[phase]['angle90'] = angle_90(numbers, number, x_coordinates, y_coordinates, ic.height,
+                                                     lineal_path[phase]['angle90'])
+
+            lineal_path[phase]['angle45'] = angle_45(numbers, number, x_coordinates, y_coordinates, ic.width, ic.height,
+                                                     lineal_path[phase]['angle45'])
+
+        for phase in ic.colors_map.keys():
+            print(lineal_path[phase]['angle90'])
+            lineal_path[phase]['angleZero'] = np.delete(lineal_path[phase]['angleZero'], 0)
+            lineal_path[phase]['angle45'] = np.delete(lineal_path[phase]['angle45'], 0)
+            lineal_path[phase]['angle90'] = np.delete(lineal_path[phase]['angle90'], 0)
+
+        angles = ['angleZero', 'angle45', 'angle90']
+        x = range(1, ic.width)
+        y = range(1, ic.height)
+        for phase in ic.colors_map.keys():
+            for angle in angles:
+                if angle == 'angleZero':
+                    plt.plot(x, lineal_path[phase]['angleZero'])
+                    plt.xlabel('distance')
+                    plt.ylabel('probability')
+                    plt.title(phase + " " + angle)
+                    plt.show()
+                else:
+                    plt.plot(y, lineal_path[phase][angle])
+                    plt.xlabel('distance')
+                    plt.ylabel('probability')
+                    plt.title(phase + " " + angle)
+                    plt.show()
+        self.linealPath = lineal_path
+
+
+@njit
+def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
+    for i in prange(50):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_0 in range(width - 1):
+            point_to_check = x + point_angle_0 + 1
+            if point_to_check >= width:
+                point_to_check = point_to_check - width
+            point_to_check_number = numbers[y, point_to_check]
+            if point_number == point_to_check_number:
+                number_angle_zero_array[point_angle_0 + 1] += 0.02
+            else:
+                break
+    return number_angle_zero_array
+
+
+@njit
+def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
+    for i in prange(50):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_90 in range(height - 1):
+            point_to_check = y + point_angle_90 + 1
+            if point_to_check >= height:
+                point_to_check = point_to_check - height
+            point_to_check_number = numbers[point_to_check, x]
+            if point_number == point_to_check_number:
+                number_angle_90_array[point_angle_90 + 1] += 0.02
+            else:
+                break
+    return number_angle_90_array
+
+
+@njit
+def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
+    for i in prange(50):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_45 in range(height - 1):
+            point_to_check_y = y - point_angle_45 + 1
+            point_to_check_x = x + point_angle_45 + 1
+            if point_to_check_y < 0:
+                point_to_check_y = point_to_check_y + height - 1
+
+            if point_to_check_x >= width:
+                point_to_check_x = point_to_check_x - width
+
+            point_to_check_number = numbers[point_to_check_y, point_to_check_x]
+            if point_number == point_to_check_number:
+                number_angle_45_array[point_angle_45 + 1] += 0.02
+            else:
+                break
+    return number_angle_45_array

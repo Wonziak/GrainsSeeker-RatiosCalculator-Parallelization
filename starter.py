@@ -40,14 +40,15 @@ if __name__ == '__main__':
         'bainite': (0, 0, 255),
         'martensite': (255, 0, 0),
     }
-    stats = Statistics(grains=[], scale=1)
-    stats.lineal_path()
+    # stats = Statistics(grains=[], scale=1)
+    # stats.lineal_path()
     # stats.one_point_prob()
     statsGPU = StatisticsGPU(grains=[])
     statsGPU.lineal_path()
     # statsGPU.one_point_prob()
     # statsGPU.blr()
     # statsCPU = StatisticsCPU(grains=[])
+    # statsCPU.lineal_path()
     # statsCPU.one_point_prob()
     # statsCPU.blr()
     # x, y = Rc().calculate_ratios(image=image, background='bainite')
