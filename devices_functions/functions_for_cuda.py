@@ -136,3 +136,85 @@ def sum_neighbours_under(layer_of_numbers, layer_of_numbers_sum_under):
 
     if 0 <= i < n - 1 and 0 <= j < m:
         layer_of_numbers_sum_under[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j, i + 1]
+
+
+@cuda.jit
+def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
+    start = cuda.grid(1)
+    stride = cuda.gridsize(1)
+    for i in range(50):
+        for j in range(width):
+            number_angle_zero_array[i][j] = 0
+
+    for i in range(start, 50, stride):
+        x = xs[i]
+        y = ys[i]
+
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_0 in range(width - 1):
+            point_to_check = x + point_angle_0 + 1
+            if point_to_check >= width:
+                point_to_check = point_to_check - width
+            point_to_check_number = numbers[y, point_to_check]
+            if point_number == point_to_check_number:
+                number_angle_zero_array[i][point_angle_0 + 1] = 0.02
+            else:
+                break
+
+
+@cuda.jit
+def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
+    start = cuda.grid(1)
+    stride = cuda.gridsize(1)
+    for i in range(50):
+        for j in range(height):
+            number_angle_90_array[i][j] = 0
+
+    for i in range(start, 50, stride):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_90 in range(height - 1):
+            point_to_check = y + point_angle_90 + 1
+            if point_to_check >= height:
+                point_to_check = point_to_check - height
+            point_to_check_number = numbers[point_to_check, x]
+            if point_number == point_to_check_number:
+                number_angle_90_array[i][point_angle_90 + 1] = 0.02
+            else:
+                break
+
+
+@cuda.jit
+def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
+    start = cuda.grid(1)
+    stride = cuda.gridsize(1)
+
+    for i in range(50):
+        for j in range(height):
+            number_angle_45_array[i][j] = 0
+
+    for i in range(start, 50, stride):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_45 in range(height - 1):
+            point_to_check_y = y - point_angle_45 + 1
+            point_to_check_x = x + point_angle_45 + 1
+            if point_to_check_y < 0:
+                point_to_check_y = point_to_check_y + height - 1
+
+            if point_to_check_x >= width:
+                point_to_check_x = point_to_check_x - width
+
+            point_to_check_number = numbers[point_to_check_y, point_to_check_x]
+            if point_number == point_to_check_number:
+                number_angle_45_array[i][point_angle_45 + 1] = 0.02
+            else:
+                break

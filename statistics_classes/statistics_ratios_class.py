@@ -90,6 +90,7 @@ class Statistics:
         print("One point probability sequentially time is: " + str(time.time() - start_time))
 
     def lineal_path(self):
+        start_time = time.time()
         for phase in ic.colors_map.keys():
             self.linealPath[phase] = {'angleZero': np.zeros((ic.width,), dtype=float),
                                       'angle90': np.zeros((ic.height,), dtype=float),
@@ -148,17 +149,17 @@ class Statistics:
             self.linealPath[phase]['angleZero'] = np.delete(self.linealPath[phase]['angleZero'], 0)
             self.linealPath[phase]['angle45'] = np.delete(self.linealPath[phase]['angle45'], 0)
             self.linealPath[phase]['angle90'] = np.delete(self.linealPath[phase]['angle90'], 0)
-
-        # angles = ['angleZero', 'angle45', 'angle90']
-        # x = range(1, ic.width)
-        # y = range(1, ic.height)
-        # for phase in ic.colors_map.keys():
-        #     for angle in angles:
-        #         if angle == 'angleZero':
-        #             plt.plot(x, self.linealPath[phase]['angleZero'])
-        #         else:
-        #             plt.plot(y, self.linealPath[phase][angle])
-        #         plt.xlabel('distance')
-        #         plt.ylabel('probability')
-        #         plt.title(phase + " " + angle)
-        #         plt.show()
+        print("lineal path sequentially time is: " + str(time.time() - start_time))
+        angles = ['angleZero', 'angle45', 'angle90']
+        x = range(1, ic.width)
+        y = range(1, ic.height)
+        for phase in ic.colors_map.keys():
+            for angle in angles:
+                if angle == 'angleZero':
+                    plt.plot(x, self.linealPath[phase]['angleZero'])
+                else:
+                    plt.plot(y, self.linealPath[phase][angle])
+                plt.xlabel('distance')
+                plt.ylabel('probability sequentially')
+                plt.title(phase + " " + angle)
+                plt.show()

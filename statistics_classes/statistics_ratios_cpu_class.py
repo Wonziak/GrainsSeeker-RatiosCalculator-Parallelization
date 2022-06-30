@@ -1,12 +1,10 @@
-from config.image_config import ImageConfig as ic
-from devices_functions.functions_for_cpu import sum_neighbours_cpu
+from devices_functions.functions_for_cpu import sum_neighbours_cpu, angle_0, angle_90, angle_45
 from .functions.statistic_ratios_cpu_functions import *
 import itertools
 import numpy as np
 import time
 from collections import defaultdict
 import math
-from numba import njit, prange
 import matplotlib.pyplot as plt
 
 statsRatiosToCalculateList = ['BorderNeighbour',
@@ -93,6 +91,7 @@ class StatisticsCPU:
         print(self.onePointProbability)
 
     def lineal_path(self):
+        start_time = time.time()
         lineal_path = {}
         for phase in ic.colors_map.keys():
             lineal_path[phase] = {'angleZero': np.zeros((ic.width,), dtype=float),
@@ -119,7 +118,7 @@ class StatisticsCPU:
             lineal_path[phase]['angleZero'] = np.delete(lineal_path[phase]['angleZero'], 0)
             lineal_path[phase]['angle45'] = np.delete(lineal_path[phase]['angle45'], 0)
             lineal_path[phase]['angle90'] = np.delete(lineal_path[phase]['angle90'], 0)
-
+        print("lineal path on CPU time is: " + str(time.time() - start_time))
         angles = ['angleZero', 'angle45', 'angle90']
         x = range(1, ic.width)
         y = range(1, ic.height)
@@ -134,72 +133,7 @@ class StatisticsCPU:
                 else:
                     plt.plot(y, lineal_path[phase][angle])
                     plt.xlabel('distance')
-                    plt.ylabel('probability')
+                    plt.ylabel('probability sequentially')
                     plt.title(phase + " " + angle)
                     plt.show()
         self.linealPath = lineal_path
-
-
-@njit
-def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
-    for i in prange(50):
-        x = xs[i]
-        y = ys[i]
-        point_number = numbers[y, x]
-        if point_number != number:
-            continue
-        for point_angle_0 in range(width - 1):
-            point_to_check = x + point_angle_0 + 1
-            if point_to_check >= width:
-                point_to_check = point_to_check - width
-            point_to_check_number = numbers[y, point_to_check]
-            if point_number == point_to_check_number:
-                number_angle_zero_array[point_angle_0 + 1] += 0.02
-            else:
-                break
-    return number_angle_zero_array
-
-
-@njit
-def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
-    for i in prange(50):
-        x = xs[i]
-        y = ys[i]
-        point_number = numbers[y, x]
-        if point_number != number:
-            continue
-        for point_angle_90 in range(height - 1):
-            point_to_check = y + point_angle_90 + 1
-            if point_to_check >= height:
-                point_to_check = point_to_check - height
-            point_to_check_number = numbers[point_to_check, x]
-            if point_number == point_to_check_number:
-                number_angle_90_array[point_angle_90 + 1] += 0.02
-            else:
-                break
-    return number_angle_90_array
-
-
-@njit
-def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
-    for i in prange(50):
-        x = xs[i]
-        y = ys[i]
-        point_number = numbers[y, x]
-        if point_number != number:
-            continue
-        for point_angle_45 in range(height - 1):
-            point_to_check_y = y - point_angle_45 + 1
-            point_to_check_x = x + point_angle_45 + 1
-            if point_to_check_y < 0:
-                point_to_check_y = point_to_check_y + height - 1
-
-            if point_to_check_x >= width:
-                point_to_check_x = point_to_check_x - width
-
-            point_to_check_number = numbers[point_to_check_y, point_to_check_x]
-            if point_number == point_to_check_number:
-                number_angle_45_array[point_angle_45 + 1] += 0.02
-            else:
-                break
-    return number_angle_45_array

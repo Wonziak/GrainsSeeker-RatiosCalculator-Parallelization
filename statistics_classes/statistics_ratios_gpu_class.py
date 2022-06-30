@@ -4,6 +4,7 @@ import numpy as np
 from collections import defaultdict
 import time
 import matplotlib.pyplot as plt
+from devices_functions.functions_for_cuda import angle_0, angle_90, angle_45
 
 statsRatiosToCalculateList = ['BorderNeighbour',
                               'Dispersion',
@@ -86,6 +87,7 @@ class StatisticsGPU:
         print("One point probability on GPU time is: " + str(time.time() - start_time))
 
     def lineal_path(self):
+        start_time = time.time()
         lineal_path = {}
         for phase in ic.colors_map.keys():
             lineal_path[phase] = {'angleZero': np.zeros(ic.width, dtype=float),
@@ -109,20 +111,24 @@ class StatisticsGPU:
         angle_45_array = cuda.device_array_like(np.zeros((50, ic.height)))
 
         for phase, number in ic.color_number.items():
+
             arr0 = np.zeros(ic.width, dtype=float)
-            angle_0[blocks_per_grid, threads_per_block](x_gpu, number, x_coordinates, y_coordinates,
+            angle_0[blocks_per_grid, threads_per_block](x_gpu, number, cuda.to_device(x_coordinates),
+                                                        cuda.to_device(y_coordinates),
                                                         ic.width, angle_zero_array)
             angle_zero_arr = angle_zero_array.copy_to_host()
             cuda.synchronize()
 
             arr90 = np.zeros(ic.height, dtype=float)
-            angle_90[blocks_per_grid, threads_per_block](x_gpu, number, x_coordinates, y_coordinates,
+            angle_90[blocks_per_grid, threads_per_block](x_gpu, number, cuda.to_device(x_coordinates),
+                                                         cuda.to_device(y_coordinates),
                                                          ic.height, angle_90_array)
             angle_90_arr = angle_90_array.copy_to_host()
             cuda.synchronize()
 
             arr45 = np.zeros(ic.height, dtype=float)
-            angle_45[blocks_per_grid, threads_per_block](x_gpu, number, x_coordinates, y_coordinates, ic.width,
+            angle_45[blocks_per_grid, threads_per_block](x_gpu, number, cuda.to_device(x_coordinates),
+                                                         cuda.to_device(y_coordinates), ic.width,
                                                          ic.height, angle_45_array)
             angle_45_arr = angle_45_array.copy_to_host()
             cuda.synchronize()
@@ -140,7 +146,7 @@ class StatisticsGPU:
             lineal_path[phase]['angleZero'] = np.delete(lineal_path[phase]['angleZero'], 0)
             lineal_path[phase]['angle45'] = np.delete(lineal_path[phase]['angle45'], 0)
             lineal_path[phase]['angle90'] = np.delete(lineal_path[phase]['angle90'], 0)
-
+        print("lineal path on GPU time is: " + str(time.time() - start_time))
         angles = ['angleZero', 'angle45', 'angle90']
         x = range(1, ic.width)
         y = range(1, ic.height)
@@ -155,89 +161,7 @@ class StatisticsGPU:
                 else:
                     plt.plot(y, lineal_path[phase][angle])
                     plt.xlabel('distance')
-                    plt.ylabel('probability')
+                    plt.ylabel('probability sequentially')
                     plt.title(phase + " " + angle)
                     plt.show()
         self.linealPath = lineal_path
-
-
-@cuda.jit
-def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
-    start = cuda.grid(1)
-    stride = cuda.gridsize(1)
-    for i in range(50):
-        for j in range(width):
-            number_angle_zero_array[i][j] = 0
-
-    for i in range(start, 50, stride):
-        x = xs[i]
-        y = ys[i]
-
-        point_number = numbers[y, x]
-        if point_number != number:
-            continue
-        for point_angle_0 in range(width - 1):
-            point_to_check = x + point_angle_0 + 1
-            if point_to_check >= width:
-                point_to_check = point_to_check - width
-            point_to_check_number = numbers[y, point_to_check]
-            if point_number == point_to_check_number:
-                number_angle_zero_array[i][point_angle_0 + 1] = 0.02
-            else:
-                break
-
-
-@cuda.jit
-def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
-    start = cuda.grid(1)
-    stride = cuda.gridsize(1)
-    for i in range(50):
-        for j in range(height):
-            number_angle_90_array[i][j] = 0
-
-    for i in range(start, 50, stride):
-        x = xs[i]
-        y = ys[i]
-        point_number = numbers[y, x]
-        if point_number != number:
-            continue
-        for point_angle_90 in range(height - 1):
-            point_to_check = y + point_angle_90 + 1
-            if point_to_check >= height:
-                point_to_check = point_to_check - height
-            point_to_check_number = numbers[point_to_check, x]
-            if point_number == point_to_check_number:
-                number_angle_90_array[point_angle_90 + 1] = 0.02
-            else:
-                break
-
-
-@cuda.jit
-def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
-    start = cuda.grid(1)
-    stride = cuda.gridsize(1)
-
-    for i in range(50):
-        for j in range(height):
-            number_angle_45_array[i][j] = 0
-
-    for i in range(start, 50, stride):
-        x = xs[i]
-        y = ys[i]
-        point_number = numbers[y, x]
-        if point_number != number:
-            continue
-        for point_angle_45 in range(height - 1):
-            point_to_check_y = y - point_angle_45 + 1
-            point_to_check_x = x + point_angle_45 + 1
-            if point_to_check_y < 0:
-                point_to_check_y = point_to_check_y + height - 1
-
-            if point_to_check_x >= width:
-                point_to_check_x = point_to_check_x - width
-
-            point_to_check_number = numbers[point_to_check_y, point_to_check_x]
-            if point_number == point_to_check_number:
-                number_angle_45_array[point_angle_45 + 1] = 0.02
-            else:
-                break

@@ -123,3 +123,68 @@ def sum_neighbours_cpu(layer_of_numbers, layer_of_numbers_sum_under, layer_of_nu
         for j in prange(layer_of_numbers.shape[0] - 1):
             layer_of_numbers_sum_right[j, i] = layer_of_numbers[j, i] + layer_of_numbers[j + 1, i]
     return layer_of_numbers_sum_right, layer_of_numbers_sum_under
+
+
+@njit(parallel=True)
+def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
+    for i in prange(50):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_0 in range(width - 1):
+            point_to_check = x + point_angle_0 + 1
+            if point_to_check >= width:
+                point_to_check = point_to_check - width
+            point_to_check_number = numbers[y, point_to_check]
+            if point_number == point_to_check_number:
+                number_angle_zero_array[point_angle_0 + 1] += 0.02
+            else:
+                break
+    return number_angle_zero_array
+
+
+@njit(parallel=True)
+def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
+    for i in prange(50):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_90 in range(height - 1):
+            point_to_check = y + point_angle_90 + 1
+            if point_to_check >= height:
+                point_to_check = point_to_check - height
+            point_to_check_number = numbers[point_to_check, x]
+            if point_number == point_to_check_number:
+                number_angle_90_array[point_angle_90 + 1] += 0.02
+            else:
+                break
+    return number_angle_90_array
+
+
+@njit(parallel=True)
+def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
+    for i in prange(50):
+        x = xs[i]
+        y = ys[i]
+        point_number = numbers[y, x]
+        if point_number != number:
+            continue
+        for point_angle_45 in range(height - 1):
+            point_to_check_y = y - point_angle_45 + 1
+            point_to_check_x = x + point_angle_45 + 1
+            if point_to_check_y < 0:
+                point_to_check_y = point_to_check_y + height - 1
+
+            if point_to_check_x >= width:
+                point_to_check_x = point_to_check_x - width
+
+            point_to_check_number = numbers[point_to_check_y, point_to_check_x]
+            if point_number == point_to_check_number:
+                number_angle_45_array[point_angle_45 + 1] += 0.02
+            else:
+                break
+    return number_angle_45_array
