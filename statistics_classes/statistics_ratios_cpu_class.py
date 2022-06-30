@@ -116,7 +116,6 @@ class StatisticsCPU:
                                                      lineal_path[phase]['angle45'])
 
         for phase in ic.colors_map.keys():
-            print(lineal_path[phase]['angle90'])
             lineal_path[phase]['angleZero'] = np.delete(lineal_path[phase]['angleZero'], 0)
             lineal_path[phase]['angle45'] = np.delete(lineal_path[phase]['angle45'], 0)
             lineal_path[phase]['angle90'] = np.delete(lineal_path[phase]['angle90'], 0)
