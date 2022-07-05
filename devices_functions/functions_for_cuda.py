@@ -139,14 +139,14 @@ def sum_neighbours_under(layer_of_numbers, layer_of_numbers_sum_under):
 
 
 @cuda.jit
-def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
+def angle_0(numbers, number, xs, ys, width, number_angle_zero_array, points_number):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
-    for i in range(50):
-        for j in range(width):
-            number_angle_zero_array[i][j] = 0
+    # for i in range(points_number):
+    #     for j in range(width):
+    #         number_angle_zero_array[i][j] = 0
 
-    for i in range(start, 50, stride):
+    for i in range(start, points_number, stride):
         x = xs[i]
         y = ys[i]
 
@@ -159,20 +159,20 @@ def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
                 point_to_check = point_to_check - width
             point_to_check_number = numbers[y, point_to_check]
             if point_number == point_to_check_number:
-                number_angle_zero_array[i][point_angle_0 + 1] = 0.02
+                number_angle_zero_array[i][point_angle_0 + 1] = 1 / points_number
             else:
                 break
 
 
 @cuda.jit
-def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
+def angle_90(numbers, number, xs, ys, height, number_angle_90_array, points_number):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
-    for i in range(50):
-        for j in range(height):
-            number_angle_90_array[i][j] = 0
+    # for i in range(points_number):
+    #     for j in range(height):
+    #         number_angle_90_array[i][j] = 0
 
-    for i in range(start, 50, stride):
+    for i in range(start, points_number, stride):
         x = xs[i]
         y = ys[i]
         point_number = numbers[y, x]
@@ -184,21 +184,21 @@ def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
                 point_to_check = point_to_check - height
             point_to_check_number = numbers[point_to_check, x]
             if point_number == point_to_check_number:
-                number_angle_90_array[i][point_angle_90 + 1] = 0.02
+                number_angle_90_array[i][point_angle_90 + 1] = 1 / points_number
             else:
                 break
 
 
 @cuda.jit
-def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
+def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array, points_number):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
 
-    for i in range(50):
-        for j in range(height):
-            number_angle_45_array[i][j] = 0
+    # for i in range(points_number):
+    #     for j in range(height):
+    #         number_angle_45_array[i][j] = 0
 
-    for i in range(start, 50, stride):
+    for i in range(start, points_number, stride):
         x = xs[i]
         y = ys[i]
         point_number = numbers[y, x]
@@ -215,6 +215,6 @@ def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
 
             point_to_check_number = numbers[point_to_check_y, point_to_check_x]
             if point_number == point_to_check_number:
-                number_angle_45_array[i][point_angle_45 + 1] = 0.02
+                number_angle_45_array[i][point_angle_45 + 1] = 1 / points_number
             else:
                 break

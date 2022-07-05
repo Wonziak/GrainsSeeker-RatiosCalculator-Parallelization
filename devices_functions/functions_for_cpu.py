@@ -126,8 +126,9 @@ def sum_neighbours_cpu(layer_of_numbers, layer_of_numbers_sum_under, layer_of_nu
 
 
 @njit(parallel=True)
-def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
-    for i in prange(50):
+def angle_0(numbers, number, xs, ys, width, number_angle_zero_array, points_number):
+    angle_0_array = np.zeros((points_number, width))
+    for i in prange(points_number):
         x = xs[i]
         y = ys[i]
         point_number = numbers[y, x]
@@ -139,15 +140,19 @@ def angle_0(numbers, number, xs, ys, width, number_angle_zero_array):
                 point_to_check = point_to_check - width
             point_to_check_number = numbers[y, point_to_check]
             if point_number == point_to_check_number:
-                number_angle_zero_array[point_angle_0 + 1] += 0.02
+                angle_0_array[i][point_angle_0 + 1] = 1 / points_number
             else:
                 break
+
+    for i in range(points_number):
+        number_angle_zero_array = np.add(number_angle_zero_array, angle_0_array[i])
     return number_angle_zero_array
 
 
 @njit(parallel=True)
-def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
-    for i in prange(50):
+def angle_90(numbers, number, xs, ys, height, number_angle_90_array, points_number):
+    angle_90_array = np.zeros((points_number, height))
+    for i in prange(points_number):
         x = xs[i]
         y = ys[i]
         point_number = numbers[y, x]
@@ -159,15 +164,18 @@ def angle_90(numbers, number, xs, ys, height, number_angle_90_array):
                 point_to_check = point_to_check - height
             point_to_check_number = numbers[point_to_check, x]
             if point_number == point_to_check_number:
-                number_angle_90_array[point_angle_90 + 1] += 0.02
+                angle_90_array[i][point_angle_90 + 1] = 1 / points_number
             else:
                 break
+    for i in range(points_number):
+        number_angle_90_array = np.add(number_angle_90_array, angle_90_array[i])
     return number_angle_90_array
 
 
 @njit(parallel=True)
-def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
-    for i in prange(50):
+def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array, points_number):
+    angle_45_array = np.zeros((points_number, height))
+    for i in prange(points_number):
         x = xs[i]
         y = ys[i]
         point_number = numbers[y, x]
@@ -184,7 +192,9 @@ def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array):
 
             point_to_check_number = numbers[point_to_check_y, point_to_check_x]
             if point_number == point_to_check_number:
-                number_angle_45_array[point_angle_45 + 1] += 0.02
+                angle_45_array[i][point_angle_45 + 1] = 1 / points_number
             else:
                 break
+    for i in range(points_number):
+        number_angle_45_array = np.add(number_angle_45_array, angle_45_array[i])
     return number_angle_45_array

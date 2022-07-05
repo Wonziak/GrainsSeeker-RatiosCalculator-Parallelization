@@ -32,10 +32,7 @@ class Statistics:
             self.borderNeighboursCountRatio[combination] = ic.color_number[pair[0]] + \
                                                            ic.color_number[pair[1]]
 
-        image_no_borders = ic.image
-        image_no_borders = remove_borders(image_no_borders, 14)
-
-        numbers = map_pixels_to_colors(image_no_borders)
+        numbers = map_pixels_to_colors(ic.image)
 
         layer_of_numbers_sum_under = np.zeros((ic.image.shape[0], ic.image.shape[1]))
         layer_of_numbers_sum_right = np.zeros((ic.image.shape[0], ic.image.shape[1]))
@@ -89,7 +86,7 @@ class Statistics:
             self.onePointProbability[key] = value / self.imageArea
         print("One point probability sequentially time is: " + str(time.time() - start_time))
 
-    def lineal_path(self):
+    def lineal_path(self, points_number):
         start_time = time.time()
         for phase in ic.colors_map.keys():
             self.linealPath[phase] = {'angleZero': np.zeros((ic.width,), dtype=float),
@@ -97,9 +94,9 @@ class Statistics:
                                       'angle45': np.zeros((ic.height,), dtype=float)}
         colorsDict = {v: k for k, v in ic.colors_map.items()}
         rng = np.random.default_rng()
-        xCoordinates = rng.choice(ic.width, 50)
-        yCoordinates = rng.choice(ic.height, 50)
-        for point in range(50):
+        xCoordinates = rng.choice(ic.width, points_number)
+        yCoordinates = rng.choice(ic.height, points_number)
+        for point in range(points_number):
             x = xCoordinates[point]
             y = yCoordinates[point]
             xyColor = (ic.image[y, x, 2], ic.image[y, x, 1], ic.image[y, x, 0])
@@ -114,7 +111,7 @@ class Statistics:
                                      ic.image[y, pointToCheck, 0])
                 if xyColor[0] == pointToCheckColor[0] and xyColor[1] == pointToCheckColor[1] and xyColor[2] == \
                         pointToCheckColor[2]:
-                    self.linealPath[colorsDict[xyColor]]['angleZero'][pointAngleZero] += 0.02
+                    self.linealPath[colorsDict[xyColor]]['angleZero'][pointAngleZero] += 1/points_number
                 else:
                     break
             for pointAngle90 in range(ic.height - 1):
@@ -126,7 +123,7 @@ class Statistics:
                                      ic.image[pointToCheck, x, 0])
                 if xyColor[0] == pointToCheckColor[0] and xyColor[1] == pointToCheckColor[1] and xyColor[2] == \
                         pointToCheckColor[2]:
-                    self.linealPath[colorsDict[xyColor]]['angle90'][pointAngle90] += 0.02
+                    self.linealPath[colorsDict[xyColor]]['angle90'][pointAngle90] += 1/points_number
                 else:
                     break
             for pointAngle45 in range(ic.height - 1):
@@ -142,7 +139,7 @@ class Statistics:
                     ic.image[pointToCheckY, pointToCheckX, 0])
                 if xyColor[0] == pointToCheckColor[0] and xyColor[1] == pointToCheckColor[1] and xyColor[2] == \
                         pointToCheckColor[2]:
-                    self.linealPath[colorsDict[xyColor]]['angle45'][pointAngle45] += 0.02
+                    self.linealPath[colorsDict[xyColor]]['angle45'][pointAngle45] += 1/points_number
                 else:
                     break
         for phase in ic.colors_map.keys():
@@ -160,6 +157,6 @@ class Statistics:
                 else:
                     plt.plot(y, self.linealPath[phase][angle])
                 plt.xlabel('distance')
-                plt.ylabel('probability sequentially')
-                plt.title(phase + " " + angle)
+                plt.ylabel('probability')
+                plt.title(phase + " " + angle + " sequentially")
                 plt.show()

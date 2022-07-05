@@ -33,10 +33,7 @@ class StatisticsCPU:
             self.borderNeighboursCountRatio[combination] = ic.color_number[pair[0]] + \
                                                            ic.color_number[pair[1]]
 
-        image_no_borders = ic.image
-        image_no_borders = remove_borders(image_no_borders, 14)
-
-        numbers = map_pixels_to_colors(image_no_borders)
+        numbers = map_pixels_to_colors(ic.image)
 
         layer_of_numbers_sum_under = np.zeros((ic.image.shape[0], ic.image.shape[1]))
         layer_of_numbers_sum_right = np.zeros((ic.image.shape[0], ic.image.shape[1]))
@@ -90,7 +87,7 @@ class StatisticsCPU:
         print("One point probability on CPU time is: " + str(time.time() - start_time))
         print(self.onePointProbability)
 
-    def lineal_path(self):
+    def lineal_path(self, points_number):
         start_time = time.time()
         lineal_path = {}
         for phase in ic.colors_map.keys():
@@ -99,20 +96,20 @@ class StatisticsCPU:
                                   'angle45': np.zeros((ic.height,), dtype=float)}
 
         rng = np.random.default_rng()
-        x_coordinates = rng.choice(ic.width, 50)
-        y_coordinates = rng.choice(ic.height, 50)
+        x_coordinates = rng.choice(ic.width, points_number)
+        y_coordinates = rng.choice(ic.height, points_number)
 
         x_coordinates = np.array(x_coordinates)
         y_coordinates = np.array(y_coordinates)
         numbers = map_pixels_to_colors(ic.image)
         for phase, number in ic.color_number.items():
             lineal_path[phase]['angleZero'] = angle_0(numbers, number, x_coordinates, y_coordinates, ic.width,
-                                                      lineal_path[phase]['angleZero'])
+                                                      lineal_path[phase]['angleZero'], points_number)
             lineal_path[phase]['angle90'] = angle_90(numbers, number, x_coordinates, y_coordinates, ic.height,
-                                                     lineal_path[phase]['angle90'])
+                                                     lineal_path[phase]['angle90'], points_number)
 
             lineal_path[phase]['angle45'] = angle_45(numbers, number, x_coordinates, y_coordinates, ic.width, ic.height,
-                                                     lineal_path[phase]['angle45'])
+                                                     lineal_path[phase]['angle45'], points_number)
 
         for phase in ic.colors_map.keys():
             lineal_path[phase]['angleZero'] = np.delete(lineal_path[phase]['angleZero'], 0)
@@ -126,14 +123,10 @@ class StatisticsCPU:
             for angle in angles:
                 if angle == 'angleZero':
                     plt.plot(x, lineal_path[phase]['angleZero'])
-                    plt.xlabel('distance')
-                    plt.ylabel('probability')
-                    plt.title(phase + " " + angle)
-                    plt.show()
                 else:
                     plt.plot(y, lineal_path[phase][angle])
-                    plt.xlabel('distance')
-                    plt.ylabel('probability sequentially')
-                    plt.title(phase + " " + angle)
-                    plt.show()
+                plt.xlabel('distance')
+                plt.ylabel('probability')
+                plt.title(phase + " " + angle + " CPU")
+                plt.show()
         self.linealPath = lineal_path

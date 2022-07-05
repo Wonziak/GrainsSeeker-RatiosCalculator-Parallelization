@@ -1,7 +1,7 @@
 from binary_images_generator import generate_binary_images
 from config.image_config import ImageConfig
 from config.devices_info import devices_info
-from contours_finder import find_contours
+from contours_finder import find_contours, find_contours_threading
 from statistics_classes.statistics_ratios_gpu_class import StatisticsGPU
 from statistics_classes.statistics_ratios_cpu_class import StatisticsCPU
 from statistics_classes.statistics_ratios_class import Statistics
@@ -9,7 +9,7 @@ from grain_instances_generator import generate_grains_instances_sequentially_gpu
 
 if __name__ == '__main__':
     devices_info()
-    image_path = 'RealImages/DP800-9800x9500.png'
+    image_path = 'RealImages/9600x9600.png'
     # image_path = 'RealImages/fragmenty_kontury/DP800-200x200_kontury.png'
     # color_map = ImageConfig.colors_map = {
     #             'ferrite': (29, 143, 255),
@@ -41,14 +41,14 @@ if __name__ == '__main__':
         'martensite': (255, 0, 0),
     }
     stats = Statistics(grains=[], scale=1)
-    stats.lineal_path()
+    stats.lineal_path(15000)
     # stats.one_point_prob()
     statsGPU = StatisticsGPU(grains=[])
-    statsGPU.lineal_path()
+    statsGPU.lineal_path(15000)
     # statsGPU.one_point_prob()
     # statsGPU.blr()
     statsCPU = StatisticsCPU(grains=[])
-    statsCPU.lineal_path()
+    statsCPU.lineal_path(20000)
     # statsCPU.one_point_prob()
     # statsCPU.blr()
     # x, y = Rc().calculate_ratios(image=image, background='bainite')

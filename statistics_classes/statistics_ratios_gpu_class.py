@@ -34,10 +34,7 @@ class StatisticsGPU:
             self.borderNeighboursCountRatio[combination] = ic.color_number[pair[0]] + \
                                                            ic.color_number[pair[1]]
 
-        image_no_borders = ic.image
-        image_no_borders = remove_borders(image_no_borders, 14)
-
-        numbers = map_pixels_to_colors(image_no_borders)
+        numbers = map_pixels_to_colors(ic.image)
 
         summed_right, summed_under = sum_neighbours(numbers)
         right_uniques, right_occurrences = np.unique(summed_right, return_counts=True)
@@ -86,7 +83,7 @@ class StatisticsGPU:
                         occurrences[index] / self.imageArea
         print("One point probability on GPU time is: " + str(time.time() - start_time))
 
-    def lineal_path(self):
+    def lineal_path(self, points_number):
         start_time = time.time()
         lineal_path = {}
         for phase in ic.colors_map.keys():
@@ -94,8 +91,8 @@ class StatisticsGPU:
                                   'angle90': np.zeros(ic.height, dtype=float),
                                   'angle45': np.zeros(ic.height, dtype=float)}
         rng = np.random.default_rng()
-        x_coordinates = rng.choice(ic.width, 50)
-        y_coordinates = rng.choice(ic.height, 50)
+        x_coordinates = rng.choice(ic.width, points_number)
+        y_coordinates = rng.choice(ic.height, points_number)
 
         x_coordinates = np.array(x_coordinates)
         y_coordinates = np.array(y_coordinates)
@@ -106,34 +103,33 @@ class StatisticsGPU:
         threads_per_block = 64
         blocks_per_grid = 96
 
-        angle_zero_array = cuda.device_array_like(np.zeros((50, ic.width)))
-        angle_90_array = cuda.device_array_like(np.zeros((50, ic.height)))
-        angle_45_array = cuda.device_array_like(np.zeros((50, ic.height)))
+        angle_zero_array = cuda.device_array_like(np.zeros((points_number, ic.width)))
+        angle_90_array = cuda.device_array_like(np.zeros((points_number, ic.height)))
+        angle_45_array = cuda.device_array_like(np.zeros((points_number, ic.height)))
 
         for phase, number in ic.color_number.items():
-
             arr0 = np.zeros(ic.width, dtype=float)
             angle_0[blocks_per_grid, threads_per_block](x_gpu, number, cuda.to_device(x_coordinates),
                                                         cuda.to_device(y_coordinates),
-                                                        ic.width, angle_zero_array)
+                                                        ic.width, angle_zero_array, points_number)
             angle_zero_arr = angle_zero_array.copy_to_host()
             cuda.synchronize()
 
             arr90 = np.zeros(ic.height, dtype=float)
             angle_90[blocks_per_grid, threads_per_block](x_gpu, number, cuda.to_device(x_coordinates),
                                                          cuda.to_device(y_coordinates),
-                                                         ic.height, angle_90_array)
+                                                         ic.height, angle_90_array, points_number)
             angle_90_arr = angle_90_array.copy_to_host()
             cuda.synchronize()
 
             arr45 = np.zeros(ic.height, dtype=float)
             angle_45[blocks_per_grid, threads_per_block](x_gpu, number, cuda.to_device(x_coordinates),
                                                          cuda.to_device(y_coordinates), ic.width,
-                                                         ic.height, angle_45_array)
+                                                         ic.height, angle_45_array, points_number)
             angle_45_arr = angle_45_array.copy_to_host()
             cuda.synchronize()
 
-            for i in range(50):
+            for i in range(points_number):
                 arr0 = np.add(arr0, angle_zero_arr[i])
                 arr90 = np.add(arr90, angle_90_arr[i])
                 arr45 = np.add(arr45, angle_45_arr[i])
@@ -154,14 +150,10 @@ class StatisticsGPU:
             for angle in angles:
                 if angle == 'angleZero':
                     plt.plot(x, lineal_path[phase]['angleZero'])
-                    plt.xlabel('distance')
-                    plt.ylabel('probability')
-                    plt.title(phase + " " + angle)
-                    plt.show()
                 else:
                     plt.plot(y, lineal_path[phase][angle])
-                    plt.xlabel('distance')
-                    plt.ylabel('probability sequentially')
-                    plt.title(phase + " " + angle)
-                    plt.show()
+                plt.xlabel('distance')
+                plt.ylabel('probability')
+                plt.title(phase + " " + angle + " GPU")
+                plt.show()
         self.linealPath = lineal_path
