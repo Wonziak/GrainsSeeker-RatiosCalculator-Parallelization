@@ -34,7 +34,7 @@ def __find_layers_sequentially(image, colors):
                         color[0]:
                     layer[j, i, 0] = 255
         phase_layers[phase] = layer
-    print("Sequentially time: " + str(time.time() - start_time))
+    print("Binary image generator Sequentially time: " + str(time.time() - start_time))
     return phase_layers
 
 
@@ -58,7 +58,7 @@ def __find_layers_gpu(image, colors):
         cuda.synchronize()
         layer = out_gpu.copy_to_host()
         phase_layers[phase] = layer
-    print("GPU parallel time: " + str(time.time() - start_time))
+    print("Binary image generator GPU parallel time: " + str(time.time() - start_time))
     return phase_layers
 
 
@@ -73,7 +73,7 @@ def __find_layers_cpu_parallel(image, colors):
         iterate_on_image_compare_color_cpu(image, ImageConfig.width, ImageConfig.height, layer,
                                            color)
         phase_layers[phase] = layer
-    print("CPU parallel time: " + str(time.time() - start_time))
+    print("Binary image generator CPU parallel time: " + str(time.time() - start_time))
     return phase_layers
 
 

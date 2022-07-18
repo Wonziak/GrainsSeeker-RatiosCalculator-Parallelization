@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 from collections import defaultdict
 import time
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from devices_functions.functions_for_cuda import angle_0, angle_90, angle_45
 
 statsRatiosToCalculateList = ['BorderNeighbour',
@@ -60,7 +60,6 @@ class StatisticsGPU:
                 border_pixels[key] += under_borders[value]
         self.borderNeighboursCountRatio = {k: v / all_border_pixels for k, v in
                                            border_pixels.items()}
-        print(border_pixels)
         print("Border length ratio on GPU time is: " + str(time.time() - start_time))
 
     def dispersion(self):
@@ -143,17 +142,17 @@ class StatisticsGPU:
             lineal_path[phase]['angle45'] = np.delete(lineal_path[phase]['angle45'], 0)
             lineal_path[phase]['angle90'] = np.delete(lineal_path[phase]['angle90'], 0)
         print("lineal path on GPU time is: " + str(time.time() - start_time))
-        angles = ['angleZero', 'angle45', 'angle90']
-        x = range(1, ic.width)
-        y = range(1, ic.height)
-        for phase in ic.colors_map.keys():
-            for angle in angles:
-                if angle == 'angleZero':
-                    plt.plot(x, lineal_path[phase]['angleZero'])
-                else:
-                    plt.plot(y, lineal_path[phase][angle])
-                plt.xlabel('distance')
-                plt.ylabel('probability')
-                plt.title(phase + " " + angle + " GPU")
-                plt.show()
+        # angles = ['angleZero', 'angle45', 'angle90']
+        # x = range(1, ic.width)
+        # y = range(1, ic.height)
+        # for phase in ic.colors_map.keys():
+        #     for angle in angles:
+        #         if angle == 'angleZero':
+        #             plt.plot(x, lineal_path[phase]['angleZero'])
+        #         else:
+        #             plt.plot(y, lineal_path[phase][angle])
+        #         plt.xlabel('distance')
+        #         plt.ylabel('probability')
+        #         plt.title(phase + " " + angle + " GPU")
+        #         plt.show()
         self.linealPath = lineal_path

@@ -1,7 +1,7 @@
 from .functions.statistic_ratios_functions import *
 import itertools
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import time
 from collections import defaultdict
 import math
@@ -59,7 +59,6 @@ class Statistics:
             if value in under_borders.keys():
                 all_border_pixels += under_borders[value]
                 border_pixels[key] += under_borders[value]
-        print(border_pixels)
         self.borderNeighboursCountRatio = {k: v / all_border_pixels for k, v in
                                            border_pixels.items()}
 
@@ -147,16 +146,16 @@ class Statistics:
             self.linealPath[phase]['angle45'] = np.delete(self.linealPath[phase]['angle45'], 0)
             self.linealPath[phase]['angle90'] = np.delete(self.linealPath[phase]['angle90'], 0)
         print("lineal path sequentially time is: " + str(time.time() - start_time))
-        angles = ['angleZero', 'angle45', 'angle90']
-        x = range(1, ic.width)
-        y = range(1, ic.height)
-        for phase in ic.colors_map.keys():
-            for angle in angles:
-                if angle == 'angleZero':
-                    plt.plot(x, self.linealPath[phase]['angleZero'])
-                else:
-                    plt.plot(y, self.linealPath[phase][angle])
-                plt.xlabel('distance')
-                plt.ylabel('probability')
-                plt.title(phase + " " + angle + " sequentially")
-                plt.show()
+        # angles = ['angleZero', 'angle45', 'angle90']
+        # x = range(1, ic.width)
+        # y = range(1, ic.height)
+        # for phase in ic.colors_map.keys():
+        #     for angle in angles:
+        #         if angle == 'angleZero':
+        #             plt.plot(x, self.linealPath[phase]['angleZero'])
+        #         else:
+        #             plt.plot(y, self.linealPath[phase][angle])
+        #         plt.xlabel('distance')
+        #         plt.ylabel('probability')
+        #         plt.title(phase + " " + angle + " sequentially")
+        #         plt.show()

@@ -184,22 +184,23 @@ def parallel_instances_generator_with_gpu(phase_grains_list: list, phase_grains_
 
 
 def save_to_file(file_name, phase_grains_dict):
-    with open(file_name, "w") as file:
-        for key in phase_grains_dict.keys():
-            for grain in phase_grains_dict[key]:
-                file.write(str(grain.area) + "\n")
-                file.write(str(grain.width_range) + "\n")
-                file.write(str(grain.height_range) + "\n")
-                file.write(str(grain.centerOfMass) + "\n")
-                file.write(str(grain.centerOfMassLocal) + "\n")
-                file.write(str(grain.distanceFromCenterPowerSum) + "\n")
-                file.write(str(grain.distanceFromEdgeToCenter) + "\n")
-                file.write(str(grain.distanceFromEdgeToCenterSquared) + "\n")
-                file.write(str(grain.minDistanceFromEdgeSum) + "\n")  # check
-                file.write(str(grain.minDistaceCenterEdge) + "\n")
-                file.write(str(grain.maxDistaceCenterEdge) + "\n")
-                file.write(str(grain.maxDistancePoints) + "\n")
-                file.write(str(grain.maxDistanceVectorCoords) + "\n")
-                file.write(str(grain.LH) + "\n")
-                file.write(str(grain.LW) + "\n")
-                file.write((str(grain.VectorPerpendicularLength)) + "\n" + "\n")
+    pass
+    # with open(file_name, "w") as file:
+    #     for key in phase_grains_dict.keys():
+    #         for grain in phase_grains_dict[key]:
+    #             file.write(str(grain.area) + "\n")
+    #             file.write(str(grain.width_range) + "\n")
+    #             file.write(str(grain.height_range) + "\n")
+    #             file.write(str(grain.centerOfMass) + "\n")
+    #             file.write(str(grain.centerOfMassLocal) + "\n")
+    #             file.write(str(grain.distanceFromCenterPowerSum) + "\n")
+    #             file.write(str(grain.distanceFromEdgeToCenter) + "\n")
+    #             file.write(str(grain.distanceFromEdgeToCenterSquared) + "\n")
+    #             file.write(str(grain.minDistanceFromEdgeSum) + "\n")  # check
+    #             file.write(str(grain.minDistaceCenterEdge) + "\n")
+    #             file.write(str(grain.maxDistaceCenterEdge) + "\n")
+    #             file.write(str(grain.maxDistancePoints) + "\n")
+    #             file.write(str(grain.maxDistanceVectorCoords) + "\n")
+    #             file.write(str(grain.LH) + "\n")
+    #             file.write(str(grain.LW) + "\n")
+    #             file.write((str(grain.VectorPerpendicularLength)) + "\n" + "\n")

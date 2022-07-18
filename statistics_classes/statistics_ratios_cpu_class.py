@@ -5,7 +5,7 @@ import numpy as np
 import time
 from collections import defaultdict
 import math
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 statsRatiosToCalculateList = ['BorderNeighbour',
                               'Dispersion',
@@ -60,7 +60,6 @@ class StatisticsCPU:
             if value in under_borders.keys():
                 all_border_pixels += under_borders[value]
                 border_pixels[key] += under_borders[value]
-        print(border_pixels)
         self.borderNeighboursCountRatio = {k: v / all_border_pixels for k, v in
                                            border_pixels.items()}
 
@@ -85,7 +84,6 @@ class StatisticsCPU:
                     self.onePointProbability[number_color_dict[unique]] = \
                         occurrences[index] / self.imageArea
         print("One point probability on CPU time is: " + str(time.time() - start_time))
-        print(self.onePointProbability)
 
     def lineal_path(self, points_number):
         start_time = time.time()
@@ -116,17 +114,17 @@ class StatisticsCPU:
             lineal_path[phase]['angle45'] = np.delete(lineal_path[phase]['angle45'], 0)
             lineal_path[phase]['angle90'] = np.delete(lineal_path[phase]['angle90'], 0)
         print("lineal path on CPU time is: " + str(time.time() - start_time))
-        angles = ['angleZero', 'angle45', 'angle90']
-        x = range(1, ic.width)
-        y = range(1, ic.height)
-        for phase in ic.colors_map.keys():
-            for angle in angles:
-                if angle == 'angleZero':
-                    plt.plot(x, lineal_path[phase]['angleZero'])
-                else:
-                    plt.plot(y, lineal_path[phase][angle])
-                plt.xlabel('distance')
-                plt.ylabel('probability')
-                plt.title(phase + " " + angle + " CPU")
-                plt.show()
+        # angles = ['angleZero', 'angle45', 'angle90']
+        # x = range(1, ic.width)
+        # y = range(1, ic.height)
+        # for phase in ic.colors_map.keys():
+        #     for angle in angles:
+        #         if angle == 'angleZero':
+        #             plt.plot(x, lineal_path[phase]['angleZero'])
+        #         else:
+        #             plt.plot(y, lineal_path[phase][angle])
+        #         plt.xlabel('distance')
+        #         plt.ylabel('probability')
+        #         plt.title(phase + " " + angle + " CPU")
+        #         plt.show()
         self.linealPath = lineal_path

@@ -2,22 +2,19 @@ from binary_images_generator import generate_binary_images
 from config.image_config import ImageConfig
 from config.devices_info import devices_info
 from contours_finder import find_contours, find_contours_threading
-from statistics_classes.statistics_ratios_gpu_class import StatisticsGPU
 from statistics_classes.statistics_ratios_cpu_class import StatisticsCPU
 from statistics_classes.statistics_ratios_class import Statistics
-from grain_instances_generator import generate_grains_instances_sequentially_gpu, generate_grains_instances_threading, \
-    generate_grains_instances_sequentially, generate_grains_instances_threading_with_gpu, \
+from grain_instances_generator import generate_grains_instances_threading, \
+    generate_grains_instances_sequentially, \
     generate_grains_instances_sequentially_with_parallel_calculations_cpu, \
     generate_grains_instances_threading_with_numba_cpu
 
 if __name__ == '__main__':
-    devices_info()
-    for image in ['200x200']:
-        print(f"\nCalculating for image {image}.png:\n")
+    devices_info(gpu=False)
+    for image in ['200x200', '400x400', '800x800', '1600x1600', '3200x3200']:
+        print(f"\nCalculating for image {image}:\n")
         image_path = f'RealImages/{image}.png'
         image_config = ImageConfig.generate_image_info(image_path=image_path)
-        phase_layers = generate_binary_images(method="GPU")
-        phase_layers = generate_binary_images(method="GPU")
         phase_layers = generate_binary_images(method="CPU")
         phase_layers = generate_binary_images(method="CPU")
         phase_layers = generate_binary_images(method="SEQ")
@@ -25,16 +22,9 @@ if __name__ == '__main__':
         contours = find_contours(phase_layers)
         find_contours_threading(phase_layers)
 
-        phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
         if image in ['200x200', '400x400']:
-            phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
             phase_grains_dict = generate_grains_instances_threading(contours)
             phase_grains_dict = generate_grains_instances_sequentially(contours)
-
-        if image in ['200x200', '400x400', '800x800', '1600x1600']:
-            phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
-
-        phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
 
         phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
         phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
@@ -51,15 +41,6 @@ if __name__ == '__main__':
         stats.one_point_prob()
         stats.dispersion()
 
-        statsGPU = StatisticsGPU(grains=phase_grains_dict)
-        statsGPU.lineal_path(20000)
-        statsGPU.lineal_path(20000)
-        statsGPU.one_point_prob()
-        statsGPU.one_point_prob()
-        statsGPU.blr()
-        statsGPU.blr()
-        statsGPU.dispersion()
-
         statsCPU = StatisticsCPU(grains=phase_grains_dict)
         statsCPU.lineal_path(20000)
         statsCPU.lineal_path(20000)
@@ -68,5 +49,5 @@ if __name__ == '__main__':
         statsCPU.blr()
         statsCPU.blr()
         statsCPU.dispersion()
-        print(f"\nCalculating for image {image} ended.\n")
+        print(f"\n Calculating for image {image} ended.\n")
     exit(0)
