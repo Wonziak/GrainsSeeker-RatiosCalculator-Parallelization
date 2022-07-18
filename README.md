@@ -14,6 +14,6 @@ GPU usage requires NVidia device and installed CUDA toolkit: https://developer.n
 #### To run no GPU version use command:
 'python starter_no_gpu.py'
 
-#### To save execution time run
+#### To save execution time run, command:
 
 'python starter.py > <file_name>.txt'
