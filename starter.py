@@ -26,7 +26,7 @@ if __name__ == '__main__':
         find_contours_threading(phase_layers)
 
         phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
-        if image in ['200x200', '400x400']:
+        if image == '200x200':
             phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
             phase_grains_dict = generate_grains_instances_threading(contours)
             phase_grains_dict = generate_grains_instances_sequentially(contours)

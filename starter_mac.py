@@ -20,7 +20,7 @@ if __name__ == '__main__':
         contours = find_contours(phase_layers)
         find_contours_threading(phase_layers)
 
-        if image in ['200x200', '400x400']:
+        if image == '200x200':
             phase_grains_dict = generate_grains_instances_threading(contours)
             phase_grains_dict = generate_grains_instances_sequentially(contours)
 
