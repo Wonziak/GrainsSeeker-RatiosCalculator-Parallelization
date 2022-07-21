@@ -12,7 +12,7 @@ from grain_instances_generator import generate_grains_instances_sequentially_gpu
 
 if __name__ == '__main__':
     devices_info()
-    for image in ['200x200', '400x400', '800x800', '1600x1600', '3200x3200']:
+    for image in ['800x800', '1600x1600', '3200x3200']:
         print(f"\nCalculating for image {image}.png:\n")
         image_path = f'RealImages/{image}.png'
         image_config = ImageConfig.generate_image_info(image_path=image_path)
@@ -25,21 +25,16 @@ if __name__ == '__main__':
         contours = find_contours(phase_layers)
         find_contours_threading(phase_layers)
 
-        phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
         if image == '200x200':
             phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
             phase_grains_dict = generate_grains_instances_threading(contours)
             phase_grains_dict = generate_grains_instances_sequentially(contours)
 
-        if image in ['200x200', '400x400', '800x800', '1600x1600']:
+        if image in ['200x200', '400x400', '800x800']:
             phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
 
-        phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
-
-        phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
         phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
 
-        phase_grains_dict = generate_grains_instances_threading_with_numba_cpu(contours)
         phase_grains_dict = generate_grains_instances_threading_with_numba_cpu(contours)
 
         # phase_grains_dict = generate_grain_instances_threads_per_grain(contours)

@@ -25,9 +25,6 @@ if __name__ == '__main__':
             phase_grains_dict = generate_grains_instances_sequentially(contours)
 
         phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
-        phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
-
-        phase_grains_dict = generate_grains_instances_threading_with_numba_cpu(contours)
         phase_grains_dict = generate_grains_instances_threading_with_numba_cpu(contours)
 
         # phase_grains_dict = generate_grain_instances_threads_per_grain(contours)
