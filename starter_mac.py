@@ -32,13 +32,13 @@ if __name__ == '__main__':
         # save_results_to_excel_file(phase_grains_dict, "seq_gpu.xlsx")
 
         stats = Statistics(grains=phase_grains_dict, scale=1)
-        stats.lineal_path(20000)
+        stats.lineal_path(5000)
         stats.one_point_prob()
         stats.dispersion()
 
         statsCPU = StatisticsCPU(grains=phase_grains_dict)
-        statsCPU.lineal_path(20000)
-        statsCPU.lineal_path(20000)
+        statsCPU.lineal_path(5000)
+        statsCPU.lineal_path(5000)
         statsCPU.one_point_prob()
         statsCPU.one_point_prob()
         statsCPU.blr()
