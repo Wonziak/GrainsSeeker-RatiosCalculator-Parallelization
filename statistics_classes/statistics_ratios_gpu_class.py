@@ -5,6 +5,7 @@ from collections import defaultdict
 import time
 # import matplotlib.pyplot as plt
 from devices_functions.functions_for_cuda import angle_0, angle_90, angle_45
+from config.devices_info import return_sm_and_threads_of_gpu
 
 statsRatiosToCalculateList = ['BorderNeighbour',
                               'Dispersion',
@@ -99,8 +100,8 @@ class StatisticsGPU:
         numbers = map_pixels_to_colors(ic.image)
 
         x_gpu = cuda.to_device(numbers)
-        threads_per_block = 64
-        blocks_per_grid = 96
+        blocks_per_grid, threads_per_block = return_sm_and_threads_of_gpu()
+
 
         angle_zero_array = cuda.device_array_like(np.zeros((points_number, ic.width)))
         angle_90_array = cuda.device_array_like(np.zeros((points_number, ic.height)))
