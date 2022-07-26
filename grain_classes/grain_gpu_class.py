@@ -10,7 +10,9 @@ from devices_functions.functions_for_cuda import calculate_distance_sum_from_cen
     calculate_distance_from_center_to_edge_gpu, create_lists_of_xs_ys_edge_gpu, \
     create_lists_of_xs_ys_domain_gpu, get_sum_of_minimal_distance_from_each_point_to_edge, \
     get_all_perpendicular_vectors_length
+from config.devices_info import return_sm_and_threads_of_gpu
 
+blocks_per_grid, threads_per_block = return_sm_and_threads_of_gpu()
 
 class GrainGPUClass(RatiosClass):
     def __init__(self, edge, phase):
@@ -63,8 +65,6 @@ class GrainGPUClass(RatiosClass):
 
     def __get_rectangle_containing_grain(self):
         x_gpu = cuda.to_device(self.edge)
-        threads_per_block = 64
-        blocks_per_grid = 96
         out_xs = cuda.device_array(shape=(len(self.edge)), dtype=np.int32)
         out_ys = cuda.device_array(shape=(len(self.edge)), dtype=np.int32)
         create_lists_of_xs_ys_edge_gpu[blocks_per_grid, threads_per_block](x_gpu, out_xs, out_ys)
@@ -90,8 +90,6 @@ class GrainGPUClass(RatiosClass):
     def find_com(self, offsetX=0, offsetY=0):  # srodek ciezkosci
         empty_array = np.zeros(len(self.domain))
         x_gpu = cuda.to_device(np.array(self.domain))
-        threads_per_block = 64
-        blocks_per_grid = 96
         out_xs = cuda.device_array_like(empty_array)
         out_ys = cuda.device_array_like(empty_array)
         create_lists_of_xs_ys_domain_gpu[blocks_per_grid, threads_per_block](x_gpu, out_xs, out_ys)
@@ -108,8 +106,6 @@ class GrainGPUClass(RatiosClass):
             self):  # suma odleglosci od srodka ciezkosci, jeden to kazda odleglosc podniesiona do kwadratu
         empty_array = np.zeros(len(self.domain))
         x_gpu = cuda.to_device(np.array(self.domain))
-        threads_per_block = 64
-        blocks_per_grid = 96
         out_gpu = cuda.device_array_like(empty_array)
         calculate_distance_sum_from_center_gpu[blocks_per_grid, threads_per_block](x_gpu, out_gpu,
                                                                                    self.centerOfMass[
@@ -128,8 +124,6 @@ class GrainGPUClass(RatiosClass):
         """
         distances = np.zeros(len(self.edge))
         x_gpu = cuda.to_device(np.array(self.edge))
-        threads_per_block = 64
-        blocks_per_grid = 96
         out_gpu = cuda.device_array_like(distances)
         calculate_distance_from_center_to_edge_gpu[blocks_per_grid, threads_per_block](x_gpu,
                                                                                        out_gpu,
@@ -169,8 +163,6 @@ class GrainGPUClass(RatiosClass):
     def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
         x_gpu = cuda.to_device(np.array(self.edge))
         y_gpu = cuda.to_device(np.array(self.domain))
-        threads_per_block = 96
-        blocks_per_grid = 96
         out_gpu = cuda.device_array_like(np.zeros((len(self.domain), len(self.edge))))
         get_sum_of_minimal_distance_from_each_point_to_edge[blocks_per_grid, threads_per_block] \
             (x_gpu, y_gpu, out_gpu)
@@ -192,8 +184,6 @@ class GrainGPUClass(RatiosClass):
 
     def __find_vector_perpendicular(self):
         x_gpu = cuda.to_device(self.edge)
-        threads_per_block = 96
-        blocks_per_grid = 96
         vector = cuda.to_device(np.zeros(2))
         distances = np.zeros(len(self.edge))
         distances_to_device = cuda.device_array_like(distances)

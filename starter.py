@@ -9,6 +9,7 @@ from grain_instances_generator import generate_grains_instances_sequentially_gpu
     generate_grains_instances_sequentially, generate_grains_instances_threading_with_gpu, \
     generate_grains_instances_sequentially_with_parallel_calculations_cpu, \
     generate_grains_instances_threading_with_numba_cpu
+import sys
 
 if __name__ == '__main__':
     devices_info()
@@ -25,13 +26,15 @@ if __name__ == '__main__':
         contours = find_contours(phase_layers)
         find_contours_threading(phase_layers)
 
+        if image in ['200x200', '400x400', '800x800']:
+            phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
+            phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
+
         if image == '200x200':
             phase_grains_dict = generate_grains_instances_threading(contours)
             phase_grains_dict = generate_grains_instances_sequentially(contours)
 
-        if image in ['200x200', '400x400', '800x800']:
-            phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
-            phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
+
 
         phase_grains_dict = generate_grains_instances_sequentially_with_parallel_calculations_cpu(contours)
 
@@ -56,12 +59,12 @@ if __name__ == '__main__':
         statsGPU.dispersion()
 
         statsCPU = StatisticsCPU(grains=phase_grains_dict)
-        statsCPU.lineal_path(5000)
-        statsCPU.lineal_path(5000)
         statsCPU.one_point_prob()
         statsCPU.one_point_prob()
         statsCPU.blr()
         statsCPU.blr()
         statsCPU.dispersion()
+        statsCPU.lineal_path(5000)
+        statsCPU.lineal_path(5000)
         print(f"\nCalculating for image {image} ended.\n")
     exit(0)
