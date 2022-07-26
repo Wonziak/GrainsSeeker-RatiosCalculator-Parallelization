@@ -10,7 +10,6 @@ from grain_instances_generator_no_gpu import generate_grains_instances_threading
     generate_grains_instances_threading_with_numba_cpu
 
 if __name__ == '__main__':
-    sys.stdout = open('results_file.txt', 'w')
     devices_info(gpu=False)
     for image in ['200x200', '400x400', '800x800', '1600x1600', '3200x3200']:
         print(f"\nCalculating for image {image}:\n")

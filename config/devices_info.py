@@ -33,6 +33,7 @@ def devices_info(cpu=True, gpu=True):
         print(subprocess.check_output("wmic cpu get name, numberofcores, maxclockspeed", shell=True).strip().decode()
               [91:])
 
+
 def return_sm_and_threads_of_gpu():
     cc_cores_per_SM_dict = {
         (2, 0): 32,

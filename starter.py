@@ -9,7 +9,6 @@ from grain_instances_generator import generate_grains_instances_sequentially_gpu
     generate_grains_instances_sequentially, generate_grains_instances_threading_with_gpu, \
     generate_grains_instances_sequentially_with_parallel_calculations_cpu, \
     generate_grains_instances_threading_with_numba_cpu
-import sys
 
 if __name__ == '__main__':
     devices_info()
