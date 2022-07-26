@@ -4,7 +4,7 @@ from config.devices_info import devices_info
 from contours_finder import find_contours, find_contours_threading
 from statistics_classes.statistics_ratios_cpu_class import StatisticsCPU
 from statistics_classes.statistics_ratios_class import Statistics
-from grain_instances_generator import generate_grains_instances_threading, \
+from grain_instances_generator_no_gpu import generate_grains_instances_threading, \
     generate_grains_instances_sequentially, \
     generate_grains_instances_sequentially_with_parallel_calculations_cpu, \
     generate_grains_instances_threading_with_numba_cpu
