@@ -1,7 +1,7 @@
 from binary_images_generator import generate_binary_images
 from config.image_config import ImageConfig
 from config.devices_info import devices_info
-from contours_finder import find_contours, find_contours_threading
+from contours_finder import find_contours, find_contours_threading, find_contours_processing
 from statistics_classes.statistics_ratios_gpu_class import StatisticsGPU
 from statistics_classes.statistics_ratios_cpu_class import StatisticsCPU
 from statistics_classes.statistics_ratios_class import Statistics
@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
         contours = find_contours(phase_layers)
         find_contours_threading(phase_layers)
-
+        find_contours_processing(phase_layers)
         if image in ['200x200', '400x400', '800x800']:
             phase_grains_dict = generate_grains_instances_sequentially_gpu(contours)
             phase_grains_dict = generate_grains_instances_threading_with_gpu(contours)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         stats.one_point_prob()
         stats.dispersion()
 
-        statsGPU = StatisticsGPU(grains=phase_grains_dict)
+        statsGPU = StatisticsGPU(grains=[])
         statsGPU.lineal_path(5000)
         statsGPU.lineal_path(5000)
         statsGPU.one_point_prob()

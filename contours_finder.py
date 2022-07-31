@@ -1,6 +1,7 @@
 import cv2
 import time
 from multiprocessing import Pool, Manager
+from multiprocessing.pool import ThreadPool
 from config.image_config import ImageConfig
 
 
@@ -17,6 +18,22 @@ def find_contours(phase_layers=dict):
 
 
 def find_contours_threading(phase_layers=dict):
+    manager = Manager()
+    phase_contours = manager.dict()
+    arguments = []
+    for phase, layer in phase_layers.items():
+        args = (phase_contours, phase, layer)
+        arguments.append(args)
+    start_time = time.time()
+    with ThreadPool(ImageConfig.colorsNumber) as pool:
+        pool.starmap(parallel_find_contours, arguments)
+    print("findContours multithreading time is: " + str(time.time() - start_time))
+    return phase_contours
+    # for phase, contours in phase_contours.items():
+    #     print("{phase}: {contours_count} contours found".format(phase=phase, contours_count=len(contours)))
+
+
+def find_contours_processing(phase_layers=dict):
     manager = Manager()
     phase_contours = manager.dict()
     arguments = []

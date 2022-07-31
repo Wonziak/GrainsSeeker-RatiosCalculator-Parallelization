@@ -1,6 +1,6 @@
 from binary_images_generator import generate_binary_images
 from config.image_config import ImageConfig
-from contours_finder import find_contours, find_contours_threading
+from contours_finder import find_contours, find_contours_threading, find_contours_processing
 from statistics_classes.statistics_ratios_cpu_class import StatisticsCPU
 from statistics_classes.statistics_ratios_class import Statistics
 from grain_instances_generator import generate_grains_instances_threading, \
@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
         contours = find_contours(phase_layers)
         find_contours_threading(phase_layers)
+        find_contours_processing(phase_layers)
 
         if image == '200x200':
             phase_grains_dict = generate_grains_instances_threading(contours)
