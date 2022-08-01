@@ -205,16 +205,16 @@ def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array, poin
         if point_number != number:
             continue
         for point_angle_45 in range(height - 1):
-            point_to_check_y = y - point_angle_45 + 1
-            point_to_check_x = x + point_angle_45 + 1
+            point_angle_45 = point_angle_45 + 1
+            point_to_check_y = y - point_angle_45
+            point_to_check_x = x + point_angle_45
+            if point_to_check_x >= width:
+                point_to_check_x = point_to_check_x - width
             if point_to_check_y < 0:
                 point_to_check_y = point_to_check_y + height - 1
 
-            if point_to_check_x >= width:
-                point_to_check_x = point_to_check_x - width
-
             point_to_check_number = numbers[point_to_check_y, point_to_check_x]
             if point_number == point_to_check_number:
-                number_angle_45_array[i][point_angle_45 + 1] = 1 / points_number
+                number_angle_45_array[i][point_angle_45] = 1 / points_number
             else:
                 break
