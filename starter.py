@@ -48,7 +48,7 @@ if __name__ == '__main__':
         stats.one_point_prob()
         stats.dispersion()
 
-        statsGPU = StatisticsGPU(grains=[])
+        statsGPU = StatisticsGPU(grains=phase_grains_dict)
         statsGPU.lineal_path(5000)
         statsGPU.lineal_path(5000)
         statsGPU.one_point_prob()
