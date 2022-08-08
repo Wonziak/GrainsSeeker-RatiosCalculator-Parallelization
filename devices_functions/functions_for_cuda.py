@@ -11,7 +11,6 @@ def iterate_on_image_compare_color_cuda(image, color, layer):
         if image[j, i, 0] == color[2] and image[j, i, 1] == color[1] and image[j, i, 2] == color[0]:
             layer[j, i, 0] = 255
 
-
 @cuda.jit
 def calculate_distance_sum_from_center_gpu(domain, output, center_of_mass_0, center_of_mass_1):
     start = cuda.grid(1)
@@ -142,9 +141,9 @@ def sum_neighbours_under(layer_of_numbers, layer_of_numbers_sum_under):
 def angle_0(numbers, number, xs, ys, width, number_angle_zero_array, points_number):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
-    # for i in range(points_number):
-    #     for j in range(width):
-    #         number_angle_zero_array[i][j] = 0
+    for i in range(points_number):
+        for j in range(width):
+            number_angle_zero_array[i][j] = 0
 
     for i in range(start, points_number, stride):
         x = xs[i]
@@ -168,9 +167,9 @@ def angle_0(numbers, number, xs, ys, width, number_angle_zero_array, points_numb
 def angle_90(numbers, number, xs, ys, height, number_angle_90_array, points_number):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
-    # for i in range(points_number):
-    #     for j in range(height):
-    #         number_angle_90_array[i][j] = 0
+    for i in range(points_number):
+        for j in range(height):
+            number_angle_90_array[i][j] = 0
 
     for i in range(start, points_number, stride):
         x = xs[i]
@@ -194,9 +193,9 @@ def angle_45(numbers, number, xs, ys, width, height, number_angle_45_array, poin
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
 
-    # for i in range(points_number):
-    #     for j in range(height):
-    #         number_angle_45_array[i][j] = 0
+    for i in range(points_number):
+        for j in range(height):
+            number_angle_45_array[i][j] = 0
 
     for i in range(start, points_number, stride):
         x = xs[i]

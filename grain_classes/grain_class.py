@@ -116,18 +116,12 @@ class GrainClass(RatiosClass):
         self.distanceFromEdgeToCenterSquared = distanceSumPower
 
     def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
-        mindist = float('inf')
         for areaPoint in self.domain:
-            for edgePoint in self.edge:
-                if areaPoint[0] == edgePoint[0][0] and areaPoint[1] == edgePoint[0][1]:
-                    continue
-                x = math.pow((edgePoint[0][0] - areaPoint[0]), 2) + math.pow(
-                    (edgePoint[0][1] - areaPoint[1]), 2)
-                dist = math.sqrt(x)
-                if dist < mindist:
-                    mindist = dist
-            self.minDistanceFromEdgeSum += mindist
-            mindist = float('inf')
+            list_of_distances = np.zeros(len(self.edge))
+            for i in range(len(self.edge)):
+                list_of_distances[i] = math.sqrt(math.pow((self.edge[i][0][0] - areaPoint[0]), 2) + math.pow(
+                    (self.edge[i][0][1] - areaPoint[1]), 2))
+            self.minDistanceFromEdgeSum += min(list_of_distances)
 
     def __calculate_max_min_from_center(
             self):  # najwieszka i najmniejsza odleglosc miedzy srodkiem i krawedzia

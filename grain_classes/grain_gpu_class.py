@@ -161,6 +161,7 @@ class GrainGPUClass(RatiosClass):
                                         coordinates[3] - coordinates[1]]
 
     def __find_min_dist_sum(self):  # suma minimalnych odleglosc od krawedzi
+        cuda.synchronize()
         x_gpu = cuda.to_device(np.array(self.edge))
         y_gpu = cuda.to_device(np.array(self.domain))
         out_gpu = cuda.device_array_like(np.zeros((len(self.domain), len(self.edge))))
