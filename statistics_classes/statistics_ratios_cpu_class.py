@@ -23,6 +23,7 @@ class StatisticsCPU:
         self.calculatedRatios = {}
         self.grains = grains
         self.scale = scale
+        self.numbers = map_pixels_to_colors(ic.image)
 
     def blr(self):
         start_time = time.time()
@@ -73,8 +74,7 @@ class StatisticsCPU:
 
     def one_point_prob(self):
         start_time = time.time()
-        numbers = map_pixels_to_colors(ic.image)
-        uniques, occurrences = np.unique(numbers, return_counts=True)
+        uniques, occurrences = np.unique(self.numbers, return_counts=True)
 
         number_color_dict = {v: k for k, v in ic.color_number.items()}
         for key, value in number_color_dict.items():
@@ -99,14 +99,13 @@ class StatisticsCPU:
 
         x_coordinates = np.array(x_coordinates)
         y_coordinates = np.array(y_coordinates)
-        numbers = map_pixels_to_colors(ic.image)
         for phase, number in ic.color_number.items():
-            lineal_path[phase]['angleZero'] = angle_0(numbers, number, x_coordinates, y_coordinates, ic.width,
+            lineal_path[phase]['angleZero'] = angle_0(self.numbers, number, x_coordinates, y_coordinates, ic.width,
                                                       lineal_path[phase]['angleZero'], points_number)
-            lineal_path[phase]['angle90'] = angle_90(numbers, number, x_coordinates, y_coordinates, ic.height,
+            lineal_path[phase]['angle90'] = angle_90(self.numbers, number, x_coordinates, y_coordinates, ic.height,
                                                      lineal_path[phase]['angle90'], points_number)
 
-            lineal_path[phase]['angle45'] = angle_45(numbers, number, x_coordinates, y_coordinates, ic.width, ic.height,
+            lineal_path[phase]['angle45'] = angle_45(self.numbers, number, x_coordinates, y_coordinates, ic.width, ic.height,
                                                      lineal_path[phase]['angle45'], points_number)
 
         for phase in ic.colors_map.keys():

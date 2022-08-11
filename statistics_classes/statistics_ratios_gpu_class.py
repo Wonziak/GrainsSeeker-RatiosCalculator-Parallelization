@@ -24,6 +24,7 @@ class StatisticsGPU:
         self.grains = grains
         self.scale = scale
         set_block()
+        self.numbers = map_pixels_to_colors(ic.image)
 
     def blr(self):
 
@@ -35,9 +36,9 @@ class StatisticsGPU:
             self.borderNeighboursCountRatio[combination] = ic.color_number[pair[0]] + \
                                                            ic.color_number[pair[1]]
 
-        numbers = map_pixels_to_colors(ic.image)
 
-        summed_right, summed_under = sum_neighbours(numbers)
+
+        summed_right, summed_under = sum_neighbours(self.numbers)
         right_uniques, right_occurrences = np.unique(summed_right, return_counts=True)
         under_uniques, under_occurrences = np.unique(summed_under, return_counts=True)
 
@@ -71,8 +72,7 @@ class StatisticsGPU:
 
     def one_point_prob(self):
         start_time = time.time()
-        numbers = map_pixels_to_colors(ic.image)
-        uniques, occurrences = np.unique(numbers, return_counts=True)
+        uniques, occurrences = np.unique(self.numbers, return_counts=True)
 
         number_color_dict = {v: k for k, v in ic.color_number.items()}
         for key, value in number_color_dict.items():
@@ -97,9 +97,8 @@ class StatisticsGPU:
         x_coordinates = np.array(x_coordinates)
         y_coordinates = np.array(y_coordinates)
 
-        numbers = map_pixels_to_colors(ic.image)
 
-        x_gpu = cuda.to_device(numbers)
+        x_gpu = cuda.to_device(self.numbers)
         blocks_per_grid, threads_per_block = return_sm_and_threads_of_gpu()
 
 
