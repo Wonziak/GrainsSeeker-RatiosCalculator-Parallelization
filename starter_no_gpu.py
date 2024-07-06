@@ -11,7 +11,7 @@ from grain_instances_generator_no_gpu import generate_grains_instances_threading
 
 if __name__ == '__main__':
     devices_info(gpu=False)
-    for image in ['1600x1600']:
+    for image in ['200x200']:
         print(f"\nCalculating for image {image}:\n")
         image_path = f'RealImages/{image}.png'
         image_config = ImageConfig.generate_image_info(image_path=image_path)

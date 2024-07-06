@@ -4,7 +4,7 @@ import math
 from grain_classes.ratios_class import RatiosClass
 import numpy as np
 import time
-import means_calc
+import coefficients
 from numba import njit, cuda
 
 
@@ -37,11 +37,16 @@ class GrainClass(RatiosClass):
     def start_calculating(self):
         # self.find_com()
         self.find_com_rust()
-        # self.__calculate_com_distances_height_width()
+        self.__calculate_com_distances_height_width()
         # self.calculateRatios()
 
     def __calculate_com_distances_height_width(self):
-        self.__calculate_distances_sum_from_center()
+        #start_time = time.time()
+        # self.__calculate_distances_sum_from_center()
+        self.distanceFromCenterPowerSum = coefficients.calculate_distances_sum_from_center(self.domain, self.centerOfMass)
+        # print(str(time.time() - start_time))
+
+
         self.__calculate_distances_from_edge_to_center()
         self.__calculate_max_min_from_center()
         # self.__calculate_max_distance_in_grain()
@@ -101,7 +106,7 @@ class GrainClass(RatiosClass):
 
     def find_com_rust(self, offsetX=0, offsetY=0):  # srodek ciezkosci
         # start_time = time.time()
-        meanX, meanY = means_calc.calculate_means(self.area-1, self.domain)
+        meanX, meanY = coefficients.calculate_means(self.area-1, self.domain)
         # print(str(time.time() - start_time))
         self.centerOfMass.append(meanX)
         self.centerOfMass.append(meanY)
