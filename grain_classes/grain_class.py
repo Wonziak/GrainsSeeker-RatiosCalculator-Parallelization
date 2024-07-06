@@ -3,6 +3,8 @@ import cv2
 import math
 from grain_classes.ratios_class import RatiosClass
 import numpy as np
+import time
+import means_calc
 from numba import njit, cuda
 
 
@@ -33,9 +35,10 @@ class GrainClass(RatiosClass):
         super().__init__()
 
     def start_calculating(self):
-        self.find_com()
-        self.__calculate_com_distances_height_width()
-        self.calculateRatios()
+        # self.find_com()
+        self.find_com_rust()
+        # self.__calculate_com_distances_height_width()
+        # self.calculateRatios()
 
     def __calculate_com_distances_height_width(self):
         self.__calculate_distances_sum_from_center()
@@ -82,6 +85,7 @@ class GrainClass(RatiosClass):
         self.LH = y_dist
 
     def find_com(self, offsetX=0, offsetY=0):  # srodek ciezkosci
+        # start_time = time.time()
         allx = 0
         ally = 0
         for i in range(self.area):
@@ -89,6 +93,16 @@ class GrainClass(RatiosClass):
             ally += self.domain[i][1]  # suma wspołrzędnych y pola
         meanX = int(allx / self.area)
         meanY = int(ally / self.area)
+        # print(str(time.time() - start_time))
+        self.centerOfMass.append(meanX)
+        self.centerOfMass.append(meanY)
+        self.centerOfMassLocal.append(meanX - offsetX * ImageConfig.widthOffset)
+        self.centerOfMassLocal.append(meanY - offsetY * ImageConfig.heightOffset)
+
+    def find_com_rust(self, offsetX=0, offsetY=0):  # srodek ciezkosci
+        # start_time = time.time()
+        meanX, meanY = means_calc.calculate_means(self.area-1, self.domain)
+        # print(str(time.time() - start_time))
         self.centerOfMass.append(meanX)
         self.centerOfMass.append(meanY)
         self.centerOfMassLocal.append(meanX - offsetX * ImageConfig.widthOffset)
